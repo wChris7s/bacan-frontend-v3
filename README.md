@@ -21,3 +21,9 @@ npm install --save-dev --save-exact prettier
 npm install @tanstack/react-query
 npm install react-router
 ```
+
+## Git
+
+```shell
+git rm -r --cached <folder>
+```
