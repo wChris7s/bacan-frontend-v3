@@ -1,7 +1,7 @@
 import { Button, Stack, Typography } from "@mui/material";
 import { ReactNode } from "react";
 import { useNavigate } from "react-router";
-import { RowStack } from "~/components/common/RowStack";
+import { RowStack } from "~/features/common/RowStack";
 
 export default function AboutScreen(): ReactNode {
   const navigate = useNavigate();
