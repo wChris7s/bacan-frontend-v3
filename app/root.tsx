@@ -28,7 +28,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
-        <title>Bacan</title>
+        <title>artivend.</title>
       </head>
       <body>
         {children}
