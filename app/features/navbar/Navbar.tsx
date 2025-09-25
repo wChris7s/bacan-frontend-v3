@@ -16,9 +16,11 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import { NavbarIconButton } from "~/features/navbar/components/NavbarIconButton";
 import { Colors } from "~/enums/Colors";
 import { NavbarSearchFilter } from "~/features/navbar/components/NavbarSearchFilter";
+import { useAuth } from "react-oidc-context";
 
 export function Navbar(): ReactNode {
   const { isMobile } = useBreakpointData();
+  const auth = useAuth();
   return (
     <RowStack
       sx={{
@@ -86,7 +88,7 @@ export function Navbar(): ReactNode {
               icon={<AccountCircleOutlinedIcon />}
               badgedCount={0}
               tooltipTitle="Cuenta de usuario"
-              onClick={() => {}}
+              onClick={() => auth.signinRedirect()}
             />
           </NavbarChildContainer>
         </RowStack>
