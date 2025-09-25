@@ -1,62 +1,93 @@
-import React from "react";
-import Button from "@mui/joy/Button";
-import SidebarItem from "~/features/sidebar/SidebarItem";
+import * as React from 'react';
+import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import MuiDrawer from '@mui/material/Drawer';
+import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import SidebarItem from './SidebarItem';
 
-const sidebarStyle: React.CSSProperties = {
-  width: "220px",
-  minWidth: "180px",
-  height: "100vh",
-  background: "#1e1414",
-  color: "#ffffff",
-  display: "flex",
-  flexDirection: "column",
-  padding: "0",
-  boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
-  borderRight: "1px solid #333",
-  overflowY: "auto",
-};
+const drawerWidth = 240;
 
-const logoStyle: React.CSSProperties = {
-  width: "120px",
-  margin: "32px auto 24px auto",
-  display: "block",
-};
+const openedMixin = (theme: Theme): CSSObject => ({
+  width: drawerWidth,
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: 'hidden',
+});
 
-const navStyle: React.CSSProperties = {
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-};
+const closedMixin = (theme: Theme): CSSObject => ({
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: 'hidden',
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up('sm')]: {
+    width: `calc(${theme.spacing(8)} + 1px)`,
+  },
+});
 
-const footerStyle: React.CSSProperties = {
-  borderTop: "1px solid #333",
-  background: "#1a1a1a",
-  position: "sticky",
-  bottom: 0,
-  width: "100%",
-  zIndex: 1,
-  display: "flex",
-  justifyContent: "center",
-};
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+}));
 
-const Sidebar: React.FC = () => (
-  <aside style={sidebarStyle} role="navigation" aria-label="Sidebar navigation">
-    <img src="/assets/logo.svg" alt="Logo" style={logoStyle} />
-    <nav style={navStyle} aria-label="Main menu">
-      <SidebarItem />
-    </nav>
-    <div style={footerStyle}>
-      <Button
-        component="a"
-        href="/"
-        color="primary"
-        variant="solid"
-        sx={{ width: "100%", maxWidth: 160 }} // Ocupa solo el espacio disponible y se centra
-      >
-        Volver a inicio
-      </Button>
-    </div>
-  </aside>
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    ...(open && {
+      ...openedMixin(theme),
+      '& .MuiDrawer-paper': openedMixin(theme),
+    }),
+    ...(!open && {
+      ...closedMixin(theme),
+      '& .MuiDrawer-paper': closedMixin(theme),
+    }),
+  })
 );
 
-export default Sidebar;
+export default function Sidebar() {
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <Drawer
+        variant="permanent"
+        open={open}
+        PaperProps={{ sx: { mt: 7.49 } }} // margen superior para separar el Drawer del Navbar
+      >
+        <DrawerHeader>
+          <IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
+            {open
+              ? (theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />)
+              : <ChevronRightIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <SidebarItem open={open} />
+      </Drawer>
+    </Box>
+  );
+}

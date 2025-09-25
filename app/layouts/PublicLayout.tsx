@@ -1,12 +1,18 @@
 import { Outlet } from "react-router";
-import { Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import { Navbar } from "~/features/navbar/Navbar";
+import Sidebar from "~/features/sidebar/Sidebar";
 
 export default function PublicLayout() {
   return (
-    <Stack sx={{ width: "100%", height: "100%" }}>
+    <Box sx={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column" }}>
       <Navbar />
-      <Outlet />
-    </Stack>
+      <Box sx={{ display: "flex", flex: 1, minHeight: 0 }}>
+        <Sidebar />
+        <Box sx={{ flex: 1, minWidth: 0, overflow: "auto" }}>
+          <Outlet />
+        </Box>
+      </Box>
+    </Box>
   );
 }

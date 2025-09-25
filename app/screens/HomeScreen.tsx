@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { RowStack } from "~/features/common/RowStack";
 import { useAuth } from "react-oidc-context";
+import Sidebar from "~/features/sidebar/Sidebar";
 
 export default function HomeScreen(): ReactNode {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export default function HomeScreen(): ReactNode {
   }
 
   return (
+
     <RowStack sx={{ gap: "8px" }}>
       <Stack sx={{ justifyContent: "center" }}>
         <Typography>Home screen</Typography>
