@@ -63,8 +63,20 @@ export function Navbar(): ReactNode {
     bottom: false,
     right: false,
   });
-
-  console.log(preferenceId);
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = React.useState(false);
+  const [notificationDrawerOpen, setNotificationDrawerOpen] = React.useState(false);
+  const categories = [
+    { name: "Electrónica", icon: "💻" },
+    { name: "Ropa y accesorios", icon: "👗" },
+    { name: "Hogar", icon: "🏠" },
+    { name: "Juguetes", icon: "🧸" },
+    { name: "Deportes", icon: "⚽" },
+    { name: "Belleza", icon: "💄" },
+    { name: "Libros", icon: "📚" },
+    { name: "Automotriz", icon: "🚗" },
+    { name: "Mascotas", icon: "🐶" },
+    { name: "Alimentos", icon: "🍔" }
+  ];
 
   const [cartItems, setCartItems] = React.useState<CartItem[]>([
     {
@@ -408,6 +420,14 @@ export function Navbar(): ReactNode {
     </Box>
   );
 
+  const notifications = [
+    { title: "¡Oferta especial!", description: "Laptop gamer con 30% de descuento.", icon: "🔥" },
+    { title: "Nuevo producto", description: "Auriculares inalámbricos disponibles.", icon: "🆕" },
+    { title: "Descuento en ropa", description: "Toda la ropa de invierno con 20% off.", icon: "🧥" },
+    { title: "Mascotas", description: "Nuevos juguetes para tu mascota.", icon: "🐾" },
+    { title: "Libros recomendados", description: "Descubre los bestsellers de este mes.", icon: "📚" }
+  ];
+
   return (
     <>
       <RowStack
@@ -441,7 +461,7 @@ export function Navbar(): ReactNode {
               />
               <NavbarButton
                 title={"Categorías"}
-                onClick={() => {}}
+                onClick={() => setCategoryDrawerOpen(true)}
                 starIcon={<CategoryOutlinedIcon />}
               />
               <NavbarButton
@@ -456,9 +476,9 @@ export function Navbar(): ReactNode {
             <NavbarChildContainer>
               <NavbarIconButton
                 icon={<NotificationsNoneOutlinedIcon />}
-                badgedCount={2}
+                badgedCount={5}
                 tooltipTitle="Notificaciones"
-                onClick={() => {}}
+                onClick={() => setNotificationDrawerOpen(true)}
               />
               <NavbarIconButton
                 icon={<ShoppingCartOutlinedIcon />}
@@ -506,6 +526,71 @@ export function Navbar(): ReactNode {
         PaperProps={{ sx: { backgroundColor: Colors.WHITE } }}
       >
         {list("right")}
+      </SwipeableDrawer>
+      <SwipeableDrawer
+        anchor="left"
+        open={categoryDrawerOpen}
+        onClose={() => setCategoryDrawerOpen(false)}
+        onOpen={() => setCategoryDrawerOpen(true)}
+        PaperProps={{ sx: { backgroundColor: Colors.WHITE, width: 340, boxShadow: 4, borderTopRightRadius: 16, borderBottomRightRadius: 16 } }}
+      >
+        <Box sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CategoryOutlinedIcon sx={{ color: Colors.BLACK, fontSize: 28 }} />
+            <Typography variant="h6" fontWeight={700} sx={{ color: Colors.BLACK }}>
+              Categorías
+            </Typography>
+          </Box>
+          <List sx={{ flex: 1, px: 2, py: 2, overflowY: 'auto', bgcolor: '#f7f7f7', borderRadius: 2 }}>
+            {categories.map((cat, idx) => (
+              <ListItem key={cat.name} disableGutters sx={{ mb: 1, px: 0 }}>
+                <Box sx={{ width: '100%', bgcolor: '#fff', borderRadius: 2, boxShadow: 1, p: 2, display: 'flex', alignItems: 'center', gap: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3, bgcolor: '#f0f0f0' } }}>
+                  <Box sx={{ width: 32, height: 32, bgcolor: '#e0e0e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2, fontSize: 22 }}>
+                    {cat.icon}
+                  </Box>
+                  <Typography variant="subtitle1" color="text.primary" sx={{ fontWeight: 500, flexGrow: 1 }}>
+                    {cat.name}
+                  </Typography>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </SwipeableDrawer>
+      <SwipeableDrawer
+        anchor="right"
+        open={notificationDrawerOpen}
+        onClose={() => setNotificationDrawerOpen(false)}
+        onOpen={() => setNotificationDrawerOpen(true)}
+        PaperProps={{ sx: { backgroundColor: Colors.WHITE, width: 340, boxShadow: 4, borderTopRightRadius: 16, borderBottomRightRadius: 16 } }}
+      >
+        <Box sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <NotificationsNoneOutlinedIcon sx={{ color: Colors.BLACK, fontSize: 28 }} />
+            <Typography variant="h6" fontWeight={700} sx={{ color: Colors.BLACK }}>
+              Notificaciones
+            </Typography>
+          </Box>
+          <List sx={{ flex: 1, px: 2, py: 2, overflowY: 'auto', bgcolor: '#f7f7f7', borderRadius: 2 }}>
+            {notifications.map((notif, idx) => (
+              <ListItem key={notif.title + idx} disableGutters sx={{ mb: 1, px: 0 }}>
+                <Box sx={{ width: '100%', bgcolor: '#fff', borderRadius: 2, boxShadow: 1, p: 2, display: 'flex', alignItems: 'center', gap: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3, bgcolor: '#f0f0f0' } }}>
+                  <Box sx={{ width: 32, height: 32, bgcolor: '#e0e0e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2, fontSize: 22 }}>
+                    {notif.icon}
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1" color="text.primary" sx={{ fontWeight: 500 }}>
+                      {notif.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {notif.description}
+                    </Typography>
+                  </Box>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
       </SwipeableDrawer>
     </>
   );
