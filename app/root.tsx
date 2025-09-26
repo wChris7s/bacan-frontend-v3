@@ -8,6 +8,28 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { AuthProvider, AuthProviderProps } from "react-oidc-context";
+import { initMercadoPago } from "@mercadopago/sdk-react";
+
+const cognitoAuthConfig: AuthProviderProps = {
+  authority: import.meta.env.VITE_AWS_AUTHORITY ?? "",
+  client_id: import.meta.env.VITE_AWS_CLIENT_ID ?? "",
+  redirect_uri: "http://localhost:5173",
+  response_type: "code",
+  scope: "email openid profile",
+  extraQueryParams: {
+    lang: "es",
+  },
+};
+
+export const signOutRedirect = () => {
+  const clientId = import.meta.env.VITE_AWS_CLIENT_ID ?? "";
+  const logoutUri = "http://localhost:5173";
+  const cognitoDomain = import.meta.env.VITE_AWS_COGNITO_DOMAIN ?? "";
+  window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+};
+
+initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY ?? "");
 
 export const links: Route.LinksFunction = () => [
   {
@@ -41,9 +63,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Outlet />
-    </ThemeProvider>
+    <AuthProvider {...cognitoAuthConfig}>
+      <ThemeProvider theme={theme}>
+        <Outlet />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 
