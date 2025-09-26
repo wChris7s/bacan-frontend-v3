@@ -44,7 +44,20 @@ export function Navbar(): ReactNode {
     bottom: false,
     right: false,
   });
-
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = React.useState(false);
+  const [notificationDrawerOpen, setNotificationDrawerOpen] = React.useState(false);
+  const categories = [
+    { name: "Electrónica", icon: "💻" },
+    { name: "Ropa y accesorios", icon: "👗" },
+    { name: "Hogar", icon: "🏠" },
+    { name: "Juguetes", icon: "🧸" },
+    { name: "Deportes", icon: "⚽" },
+    { name: "Belleza", icon: "💄" },
+    { name: "Libros", icon: "📚" },
+    { name: "Automotriz", icon: "🚗" },
+    { name: "Mascotas", icon: "🐶" },
+    { name: "Alimentos", icon: "🍔" }
+  ];
 
   const [cartItems, setCartItems] = React.useState<CartItem[]>([
     { name: "Computadora", price: "$3000.00", quantity: 2, image: "https://cdn.thewirecutter.com/wp-content/media/2024/11/cheapgaminglaptops-2048px-7981.jpg" },
@@ -55,7 +68,6 @@ export function Navbar(): ReactNode {
     { name: "Rompero", price: "$200.00", quantity: 2, image: "https://promart.vteximg.com.br/arquivos/roperos_de_maderanatural_boton_80x80.jpg" },
   ]);
 
-
   const parseCurrencyToCents = (value: string): number => {
     const normalized = value.replace(/[^0-9.,-]/g, "").replace(",", ".");
     const num = parseFloat(normalized || "0");
@@ -63,14 +75,12 @@ export function Navbar(): ReactNode {
   };
   const formatCents = (cents: number): string => `$${(cents / 100).toFixed(2)}`;
 
-
   const handleIncrement = (index: number) => {
     setCartItems((prev) => prev.map((it, i) => i === index ? { ...it, quantity: it.quantity + 1 } : it));
   };
   const handleDecrement = (index: number) => {
     setCartItems((prev) => prev.map((it, i) => i === index ? { ...it, quantity: Math.max(1, it.quantity - 1) } : it));
   };
-
 
   const grandTotal = (() => {
     let sum = 0;
@@ -90,7 +100,6 @@ export function Navbar(): ReactNode {
       ) {
         return;
       }
-
       setState({ ...state, [anchor]: open });
     };
 
@@ -101,12 +110,10 @@ export function Navbar(): ReactNode {
       onClick={toggleDrawer(anchor, false)}
       onKeyDown={toggleDrawer(anchor, false)}
     >
-      {/* Encabezado */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, p: 2, borderBottom: "1px solid", borderColor: "divider" }}>
         <ShoppingCartIcon />
         <Typography variant="subtitle1" fontWeight={600}>Carrito de compras</Typography>
       </Box>
-
       <List>
         {cartItems.map((item, index) => (
           <ListItem key={`${item.name}-${index}`} disableGutters sx={{ px: 2, py: 1.5 }}>
@@ -117,14 +124,10 @@ export function Navbar(): ReactNode {
                 alt={item.name}
                 sx={{ width: 56, height: 56, borderRadius: 1, objectFit: "cover", border: "1px solid", borderColor: "divider" }}
               />
-
-              {/* Nombre y precio unitario */}
               <Box sx={{ ml: 1, flexGrow: 1, minWidth: 0 }}>
                 <Typography variant="subtitle2" noWrap>{item.name}</Typography>
                 <Typography variant="body2" color="text.secondary">{item.price} c/u</Typography>
               </Box>
-
-              {/* Cantidad */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleDecrement(index); }} aria-label={`Disminuir cantidad de ${item.name}`}>
                   <RemoveIcon fontSize="small" />
@@ -134,13 +137,9 @@ export function Navbar(): ReactNode {
                   <AddIcon fontSize="small" />
                 </IconButton>
               </Box>
-
-              {/* Total del ítem: price * quantity */}
               <Typography variant="subtitle2" sx={{ ml: 1, minWidth: 64, textAlign: "right" }}>
                 {formatCents(parseCurrencyToCents(item.price) * item.quantity)}
               </Typography>
-
-              {/* Botón eliminar producto (sin funcionalidad) */}
               <IconButton size="small" aria-label={`Eliminar ${item.name}`} sx={{ ml: 1 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 7h12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12z" stroke="#d32f2f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -150,15 +149,11 @@ export function Navbar(): ReactNode {
             </Box>
           </ListItem>
         ))}
-
         <Divider sx={{ my: 1 }} />
-
-        {/* Total general */}
         <ListItem sx={{ px: 2, py: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", width: "100%", gap: 2 }}>
             <Typography variant="subtitle1" sx={{ flexGrow: 1 }}>Total</Typography>
             <Typography variant="h6">{grandTotal}</Typography>
-            {/* Botón comprar (sin funcionalidad) con icono verde de continuar */}
             <IconButton size="medium" aria-label="Continuar compra" sx={{ ml: 2, bgcolor: '#43a047', color: '#fff', '&:hover': { bgcolor: '#2e7031' } }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="10" fill="#43a047" />
@@ -170,6 +165,14 @@ export function Navbar(): ReactNode {
       </List>
     </Box>
   );
+
+  const notifications = [
+    { title: "¡Oferta especial!", description: "Laptop gamer con 30% de descuento.", icon: "🔥" },
+    { title: "Nuevo producto", description: "Auriculares inalámbricos disponibles.", icon: "🆕" },
+    { title: "Descuento en ropa", description: "Toda la ropa de invierno con 20% off.", icon: "🧥" },
+    { title: "Mascotas", description: "Nuevos juguetes para tu mascota.", icon: "🐾" },
+    { title: "Libros recomendados", description: "Descubre los bestsellers de este mes.", icon: "📚" }
+  ];
 
   return (
     <>
@@ -193,7 +196,6 @@ export function Navbar(): ReactNode {
             <AppAssets.AppLogo />
           </SvgIcon>
         </RowStack>
-
         {!isMobile && (
           <RowStack sx={{ width: "100%", gap: "4px" }}>
             <NavbarChildContainer>
@@ -205,8 +207,7 @@ export function Navbar(): ReactNode {
               />
               <NavbarButton
                 title={"Categorías"}
-                onClick={() => {
-                }}
+                onClick={() => setCategoryDrawerOpen(true)}
                 starIcon={<CategoryOutlinedIcon />}
               />
               <NavbarButton
@@ -223,14 +224,13 @@ export function Navbar(): ReactNode {
             <NavbarChildContainer>
               <NavbarIconButton
                 icon={<NotificationsNoneOutlinedIcon />}
-                badgedCount={2}
+                badgedCount={5}
                 tooltipTitle="Notificaciones"
-                onClick={() => {
-                }}
+                onClick={() => setNotificationDrawerOpen(true)}
               />
               <NavbarIconButton
                 icon={<ShoppingCartOutlinedIcon />}
-                badgedCount={3}
+                badgedCount={6}
                 tooltipTitle="Carrito de compras"
                 onClick={toggleDrawer("right", true)}
               />
@@ -250,7 +250,6 @@ export function Navbar(): ReactNode {
             </NavbarChildContainer>
           </RowStack>
         )}
-
         {isMobile && (
           <RowStack
             sx={{
@@ -266,7 +265,6 @@ export function Navbar(): ReactNode {
           </RowStack>
         )}
       </RowStack>
-
       <SwipeableDrawer
         anchor={"right"}
         open={state["right"]}
@@ -275,6 +273,71 @@ export function Navbar(): ReactNode {
         PaperProps={{ sx: { backgroundColor: Colors.WHITE } }}
       >
         {list("right")}
+      </SwipeableDrawer>
+      <SwipeableDrawer
+        anchor="left"
+        open={categoryDrawerOpen}
+        onClose={() => setCategoryDrawerOpen(false)}
+        onOpen={() => setCategoryDrawerOpen(true)}
+        PaperProps={{ sx: { backgroundColor: Colors.WHITE, width: 340, boxShadow: 4, borderTopRightRadius: 16, borderBottomRightRadius: 16 } }}
+      >
+        <Box sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CategoryOutlinedIcon sx={{ color: Colors.BLACK, fontSize: 28 }} />
+            <Typography variant="h6" fontWeight={700} sx={{ color: Colors.BLACK }}>
+              Categorías
+            </Typography>
+          </Box>
+          <List sx={{ flex: 1, px: 2, py: 2, overflowY: 'auto', bgcolor: '#f7f7f7', borderRadius: 2 }}>
+            {categories.map((cat, idx) => (
+              <ListItem key={cat.name} disableGutters sx={{ mb: 1, px: 0 }}>
+                <Box sx={{ width: '100%', bgcolor: '#fff', borderRadius: 2, boxShadow: 1, p: 2, display: 'flex', alignItems: 'center', gap: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3, bgcolor: '#f0f0f0' } }}>
+                  <Box sx={{ width: 32, height: 32, bgcolor: '#e0e0e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2, fontSize: 22 }}>
+                    {cat.icon}
+                  </Box>
+                  <Typography variant="subtitle1" color="text.primary" sx={{ fontWeight: 500, flexGrow: 1 }}>
+                    {cat.name}
+                  </Typography>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </SwipeableDrawer>
+      <SwipeableDrawer
+        anchor="right"
+        open={notificationDrawerOpen}
+        onClose={() => setNotificationDrawerOpen(false)}
+        onOpen={() => setNotificationDrawerOpen(true)}
+        PaperProps={{ sx: { backgroundColor: Colors.WHITE, width: 340, boxShadow: 4, borderTopRightRadius: 16, borderBottomRightRadius: 16 } }}
+      >
+        <Box sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <NotificationsNoneOutlinedIcon sx={{ color: Colors.BLACK, fontSize: 28 }} />
+            <Typography variant="h6" fontWeight={700} sx={{ color: Colors.BLACK }}>
+              Notificaciones
+            </Typography>
+          </Box>
+          <List sx={{ flex: 1, px: 2, py: 2, overflowY: 'auto', bgcolor: '#f7f7f7', borderRadius: 2 }}>
+            {notifications.map((notif, idx) => (
+              <ListItem key={notif.title + idx} disableGutters sx={{ mb: 1, px: 0 }}>
+                <Box sx={{ width: '100%', bgcolor: '#fff', borderRadius: 2, boxShadow: 1, p: 2, display: 'flex', alignItems: 'center', gap: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3, bgcolor: '#f0f0f0' } }}>
+                  <Box sx={{ width: 32, height: 32, bgcolor: '#e0e0e0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2, fontSize: 22 }}>
+                    {notif.icon}
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1" color="text.primary" sx={{ fontWeight: 500 }}>
+                      {notif.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {notif.description}
+                    </Typography>
+                  </Box>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
       </SwipeableDrawer>
     </>
   );
