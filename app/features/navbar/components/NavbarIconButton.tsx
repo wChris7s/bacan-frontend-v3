@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { Colors } from "~/enums/Colors";
 
 interface NavbarIconButtonProps {
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   icon: ReactNode;
   badgedCount: number;
   tooltipTitle: string;
