@@ -34,6 +34,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Wallet } from "@mercadopago/sdk-react";
+import { useNavigate } from "react-router";
 
 type Anchor = "top" | "left" | "bottom" | "right";
 
@@ -71,6 +72,7 @@ export function Navbar(): ReactNode {
     bottom: false,
     right: false,
   });
+  const navigate = useNavigate();
   const [categoryDrawerOpen, setCategoryDrawerOpen] = React.useState(false);
   const [notificationDrawerOpen, setNotificationDrawerOpen] =
     React.useState(false);
@@ -536,7 +538,9 @@ export function Navbar(): ReactNode {
                   icon={<AccountCircleOutlinedIcon />}
                   badgedCount={0}
                   tooltipTitle="Cuenta de usuario"
-                  onClick={() => auth.signinRedirect()}
+                  onClick={() => {
+                    navigate("register");
+                  }}
                 />
               )}
             </NavbarChildContainer>
