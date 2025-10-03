@@ -7,6 +7,8 @@ export default [
       route("about", "./screens/AboutScreen.tsx"),
     ]),
 
-    layout("./layouts/PrivateLayout.tsx", []),
+    layout("./layouts/PrivateLayout.tsx", [
+      route("emprendedor", "./screens/EmprendedorScreen.tsx"),
+    ]),
   ]),
 ] satisfies RouteConfig;

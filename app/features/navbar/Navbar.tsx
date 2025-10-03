@@ -485,7 +485,7 @@ export function Navbar(): ReactNode {
             <NavbarChildContainer>
               <NavbarButton
                 title={"Emprendimientos"}
-                onClick={() => {}}
+                onClick={() => window.location.assign("/emprendedor")}
                 starIcon={<StoreOutlinedIcon />}
               />
               <NavbarButton
