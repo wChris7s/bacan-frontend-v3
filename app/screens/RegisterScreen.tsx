@@ -16,9 +16,9 @@ import { useNavigate } from "react-router";
 const registerSchema = z
   .object({
     name: z.string().min(2, "El nombre es obligatorio"),
-    surname: z.string().min(2, "El apellido es obligatorio"),
+    lastname: z.string().min(2, "El apellido es obligatorio"),
     // Documento de identidad (DNI / documento)
-    documentoIdentidad: z.string().min(4, "Documento inválido"),
+    documentId: z.string().min(4, "Documento inválido"),
     phone: z
       .string()
       .min(7, "Teléfono inválido")
@@ -31,11 +31,11 @@ const registerSchema = z
     country: z.string().min(2, "El país es obligatorio"),
     state: z.string().min(2, "El estado es obligatorio"),
     province: z.string().min(2, "La provincia es obligatoria"),
-    distrito: z.string().min(2, "El distrito es obligatorio"),
-    calle: z.string().min(2, "La calle es obligatoria"),
-    codigoPostal: z.string().min(3, "Código postal inválido").max(10, "Código postal inválido"),
-    numeroDomicilio: z.string().min(1, "Número inválido"),
-    referencia: z.string().optional(),
+    districtId: z.string().min(2, "El distrito es obligatorio"),
+    street: z.string().min(2, "La calle es obligatoria"),
+    postalCode: z.string().min(3, "Código postal inválido").max(10, "Código postal inválido"),
+    number: z.string().min(1, "Número inválido"),
+    reference: z.string().optional(),
   })
   .superRefine((val, ctx) => {
     if (val.password !== val.confirmPassword) {
@@ -65,8 +65,8 @@ export default function RegisterScreen() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
-      surname: "",
-      documentoIdentidad: "",
+      lastname: "",
+      documentId: "",
       country: "",
       state: "",
       province: "",
@@ -76,11 +76,11 @@ export default function RegisterScreen() {
       confirmPassword: "",
       role: "user",
       // defaults for address
-      distrito: "",
-      calle: "",
-      codigoPostal: "",
-      numeroDomicilio: "",
-      referencia: "",
+      districtId: "",
+      street: "",
+      postalCode: "",
+      number: "",
+      reference: "",
     },
   });
 
@@ -90,7 +90,7 @@ export default function RegisterScreen() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [submitting, setSubmitting] = React.useState(false);
   // roleCode: '2' = emprendedor, '3' = cliente
-  const [roleCode, setRoleCode] = React.useState<string>("3");
+  const [roleId, setroleId] = React.useState<string>("3");
   const [snackOpen, setSnackOpen] = React.useState(false);
   const [snackMessage, setSnackMessage] = React.useState("");
   const [snackSeverity, setSnackSeverity] = React.useState<"success" | "error">("success");
@@ -121,7 +121,7 @@ export default function RegisterScreen() {
     const fetchCountries = async () => {
       setLoadingCountries(true);
       try {
-        const res = await fetch("http://localhost:9095/bcn/api/location/country");
+        const res = await fetch("http://localhost:8991/bcn/api/location/country");
         if (!mounted) return;
         if (!res.ok) {
           const text = await res.text();
@@ -162,7 +162,7 @@ export default function RegisterScreen() {
       }
       setLoadingStates(true);
       try {
-        const res = await fetch(`http://localhost:9095/bcn/api/location/state/country/${countryId}`);
+        const res = await fetch(`http://localhost:8991/bcn/api/location/state/country/${countryId}`);
         if (!mounted) return;
         if (!res.ok) {
           const text = await res.text();
@@ -214,7 +214,7 @@ export default function RegisterScreen() {
       }
       setLoadingProvinces(true);
       try {
-        const res = await fetch(`http://localhost:9095/bcn/api/location/province/state/${stateId}`);
+        const res = await fetch(`http://localhost:8991/bcn/api/location/province/state/${stateId}`);
         if (!mounted) return;
         if (!res.ok) {
           const text = await res.text();
@@ -262,7 +262,7 @@ export default function RegisterScreen() {
       }
       setLoadingDistricts(true);
       try {
-        const res = await fetch(`http://localhost:9095/bcn/api/location/district/province/${provinceId}`);
+        const res = await fetch(`http://localhost:8991/bcn/api/location/district/province/${provinceId}`);
         if (!mounted) return;
         if (!res.ok) {
           const text = await res.text();
@@ -278,7 +278,7 @@ export default function RegisterScreen() {
         // Asumimos que la API devuelve FullDistrictDTO[]
         setDistrictsList(Array.isArray(data) ? data : []);
         // limpiar valor de distrito en el formulario
-        setValue("distrito", "");
+        setValue("districtId", "");
       } catch (err: any) {
         console.error("Error al cargar distritos:", err);
         setSnackMessage("No se pudieron cargar los distritos para la provincia seleccionada");
@@ -300,14 +300,33 @@ export default function RegisterScreen() {
   const handleRegister = async (data: RegisterFormData) => {
     setSubmitting(true);
     try {
-      // No enviar confirmPassword al backend
-      const { confirmPassword, ...payload } = data as any;
-      // Añadir roleCode al payload para backend si lo requiere
-      (payload as any).roleCode = roleCode;
-      const res = await fetch("http://localhost:9095/bcn/api/auth/register", {
+      const values = getValues() as RegisterFormData;
+      // Construir el payload con address anidado
+      const userPayload = {
+        documentId: values.documentId,
+        name: values.name,
+        lastname: values.lastname,
+        phone: values.phone,
+        email: values.email,
+        roleId: roleId === "2" ? 2 : 3,
+        address: {
+          districtId: values.districtId,
+          street: values.street,
+          postalCode: values.postalCode,
+          number: values.number,
+          reference: values.reference || "",
+        },
+      };
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      // Incluir Authorization si existe token
+      if ((auth as any)?.user?.access_token) {
+        headers["Authorization"] = `Bearer ${(auth as any).user.access_token}`;
+      }
+      // Enviar el payload con address anidado al endpoint de registro
+      const res = await fetch("http://localhost:8991/bcn/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers,
+        body: JSON.stringify(userPayload),
       });
 
       if (!res.ok) {
@@ -336,22 +355,21 @@ export default function RegisterScreen() {
 
 
       try {
+        const values = getValues() as RegisterFormData;
+
         const userPayload = {
-          documentId: payload.documentoIdentidad,
-          name: payload.name,
-          lastname: payload.surname,
-          phone: payload.phone,
-          email: payload.email,
-          roleId: Number(roleCode),
+          documentId: values.documentId,
+          name: values.name,
+          lastname: values.lastname,
+          phone: values.phone,
+          email: values.email,
+          roleId: roleId === "2" ? 2 : 3,
           address: {
-            country: payload.country,
-            state: payload.state,
-            province: payload.province,
-            districtId: payload.distrito,
-            street: payload.calle,
-            postalCode: payload.codigoPostal,
-            number: payload.numeroDomicilio,
-            reference: payload.referencia || "",
+            districtId: values.districtId,
+            street: values.street,
+            postalCode: values.postalCode,
+            number: values.number,
+            reference: values.reference || "",
           },
         };
 
@@ -361,7 +379,7 @@ export default function RegisterScreen() {
           headers["Authorization"] = `Bearer ${(auth as any).user.access_token}`;
         }
 
-        const resUser = await fetch("http://localhost:9095/bcn/api/user", {
+        const resUser = await fetch("http://localhost:8991/bcn/api/user", {
           method: "POST",
           headers,
           body: JSON.stringify(userPayload),
@@ -416,7 +434,7 @@ export default function RegisterScreen() {
 
   const onNext = async () => {
     if (activeStep === 0) {
-      const valid = await trigger(["name", "surname", "documentoIdentidad", "phone", "email", "password", "confirmPassword"]);
+      const valid = await trigger(["name", "lastname", "documentId", "phone", "email", "password", "confirmPassword"]);
       if (!valid) return;
       setActiveStep(1);
     } else if (activeStep === 1) {
@@ -426,7 +444,7 @@ export default function RegisterScreen() {
       setActiveStep(2);
     } else {
       // último paso: validar todos los campos de dirección y enviar
-      const valid = await trigger(["country", "state", "province", "distrito", "calle", "codigoPostal", "numeroDomicilio"]);
+      const valid = await trigger(["country", "state", "province", "districtId", "street", "postalCode", "number"]);
       if (!valid) return;
 
       try {
@@ -447,7 +465,7 @@ export default function RegisterScreen() {
 
   const handleCardSelect = (role: "user" | "entrepreneur") => {
     setValue("role", role);
-    setRoleCode(role === "entrepreneur" ? "2" : "3");
+    setroleId(role === "entrepreneur" ? "2" : "3");
   };
 
   return (
@@ -495,15 +513,15 @@ export default function RegisterScreen() {
 
                 <Box>
                   <Controller
-                    name="surname"
+                    name="lastname"
                     control={control}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label="Apellido"
                         fullWidth
-                        error={!!errors.surname}
-                        helperText={errors.surname?.message}
+                        error={!!errors.lastname}
+                        helperText={errors.lastname?.message}
                       />
                     )}
                   />
@@ -511,15 +529,15 @@ export default function RegisterScreen() {
 
                 <Box>
                   <Controller
-                    name="documentoIdentidad"
+                    name="documentId"
                     control={control}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label="Documento de identidad"
                         fullWidth
-                        error={!!errors.documentoIdentidad}
-                        helperText={errors.documentoIdentidad?.message}
+                        error={!!errors.documentId}
+                        helperText={errors.documentId?.message}
                       />
                     )}
                   />
@@ -772,18 +790,18 @@ export default function RegisterScreen() {
 
                 <Box>
                   <Controller
-                    name="distrito"
+                    name="districtId"
                     control={control}
                     render={({ field }) => (
                       <FormControl fullWidth>
-                        <InputLabel id="district-label">Distrito</InputLabel>
+                        <InputLabel id="district-label">districtId</InputLabel>
                         <Select
                           labelId="district-label"
-                          label="Distrito"
+                          label="districtId"
                           {...field}
                           value={field.value || ""}
                           onChange={(e) => field.onChange(e.target.value)}
-                          error={!!errors.distrito}
+                          error={!!errors.districtId}
                         >
                           {loadingDistricts && (
                             <MenuItem value="" disabled>
@@ -803,9 +821,9 @@ export default function RegisterScreen() {
                             </MenuItem>
                           ))}
                         </Select>
-                        {errors.distrito && (
+                        {errors.districtId && (
                           <Typography variant="body2" color="error">
-                            {errors.distrito.message}
+                            {errors.districtId.message}
                           </Typography>
                         )}
                       </FormControl>
@@ -815,40 +833,40 @@ export default function RegisterScreen() {
 
                 <Box>
                   <Controller
-                    name="calle"
+                    name="street"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label="Calle" fullWidth error={!!errors.calle} helperText={errors.calle?.message} />
+                      <TextField {...field} label="street" fullWidth error={!!errors.street} helperText={errors.street?.message} />
                     )}
                   />
                 </Box>
 
                 <Box>
                   <Controller
-                    name="codigoPostal"
+                    name="postalCode"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label="Código postal" fullWidth error={!!errors.codigoPostal} helperText={errors.codigoPostal?.message} />
+                      <TextField {...field} label="Código postal" fullWidth error={!!errors.postalCode} helperText={errors.postalCode?.message} />
                     )}
                   />
                 </Box>
 
                 <Box>
                   <Controller
-                    name="numeroDomicilio"
+                    name="number"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label="Número de domicilio" fullWidth error={!!errors.numeroDomicilio} helperText={errors.numeroDomicilio?.message} />
+                      <TextField {...field} label="Número de domicilio" fullWidth error={!!errors.number} helperText={errors.number?.message} />
                     )}
                   />
                 </Box>
 
                 <Box sx={{ gridColumn: "1 / -1" }}>
                   <Controller
-                    name="referencia"
+                    name="reference"
                     control={control}
                     render={({ field }) => (
-                      <TextField {...field} label="Referencia (opcional)" fullWidth error={!!errors.referencia} helperText={errors.referencia?.message} />
+                      <TextField {...field} label="reference (opcional)" fullWidth error={!!errors.reference} helperText={errors.reference?.message} />
                     )}
                   />
                 </Box>
