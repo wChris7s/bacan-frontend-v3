@@ -18,6 +18,7 @@ import {
   useTheme,
   Dialog,
 } from "@mui/material";
+import { useNavigate } from "react-router";
 import {
   TrendingUp,
   ShoppingCart,
@@ -228,6 +229,7 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ value, label, color, bgcolor 
 
 export default function EmprendedorScreen() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [openEdit, setOpenEdit] = useState(false);
 
   return (
@@ -259,21 +261,31 @@ export default function EmprendedorScreen() {
         }}
       >
         <MetricCard
-          icon={<Inventory sx={{ fontSize: 40, color: theme.palette.primary.main }} />}
+          icon={
+            <Inventory
+              sx={{ fontSize: 40, color: theme.palette.primary.main }}
+            />
+          }
           value={dashboardData.metrics.totalProducts}
           label="Productos Totales"
           color={theme.palette.primary.main}
           bgcolor={theme.palette.primary.light + "33"}
         />
         <MetricCard
-          icon={<TrendingUp sx={{ fontSize: 40, color: theme.palette.success.main }} />}
+          icon={
+            <TrendingUp
+              sx={{ fontSize: 40, color: theme.palette.success.main }}
+            />
+          }
           value={dashboardData.metrics.totalSales}
           label="Ventas Totales"
           color={theme.palette.success.main}
           bgcolor={theme.palette.success.light + "33"}
         />
         <MetricCard
-          icon={<Today sx={{ fontSize: 40, color: theme.palette.warning.main }} />}
+          icon={
+            <Today sx={{ fontSize: 40, color: theme.palette.warning.main }} />
+          }
           value={dashboardData.metrics.todayOrders}
           label="Pedidos Hoy"
           color={theme.palette.warning.main}
@@ -403,7 +415,9 @@ export default function EmprendedorScreen() {
                             alignItems: "center",
                           }}
                         >
-                          <Typography variant="subtitle2">{review.customer}</Typography>
+                          <Typography variant="subtitle2">
+                            {review.customer}
+                          </Typography>
                           <Rating value={review.rating} size="small" readOnly />
                         </Box>
                       }
@@ -423,7 +437,9 @@ export default function EmprendedorScreen() {
                       }
                     />
                   </ListItem>
-                  {index < dashboardData.recentReviews.length - 1 && <Divider />}
+                  {index < dashboardData.recentReviews.length - 1 && (
+                    <Divider />
+                  )}
                 </React.Fragment>
               ))}
             </List>
@@ -477,7 +493,9 @@ export default function EmprendedorScreen() {
               {dashboardData.recentProducts.map((product, index) => (
                 <React.Fragment key={product.id}>
                   <ProductItem product={product} />
-                  {index < dashboardData.recentProducts.length - 1 && <Divider />}
+                  {index < dashboardData.recentProducts.length - 1 && (
+                    <Divider />
+                  )}
                 </React.Fragment>
               ))}
             </List>
@@ -606,15 +624,21 @@ export default function EmprendedorScreen() {
               fullWidth
               sx={{ py: 2 }}
               startIcon={<AttachMoney />}
+              onClick={() => navigate("/entrepreneur/add-product")}
             >
-              Configurar Pagos
+              Agregar producto
             </Button>
           </Box>
         </CardContent>
       </Card>
 
-      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="md" fullWidth>
-        <CreateStoreForm />
+      <Dialog
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <CreateStoreForm documentId={""} />
       </Dialog>
     </Box>
   );

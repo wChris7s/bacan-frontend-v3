@@ -35,6 +35,8 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Wallet } from "@mercadopago/sdk-react";
 import { useNavigate } from "react-router";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 type Anchor = "top" | "left" | "bottom" | "right";
 
@@ -76,6 +78,16 @@ export function Navbar(): ReactNode {
   const [categoryDrawerOpen, setCategoryDrawerOpen] = React.useState(false);
   const [notificationDrawerOpen, setNotificationDrawerOpen] =
     React.useState(false);
+  const [accountAnchorEl, setAccountAnchorEl] = React.useState<null | HTMLElement>(null);
+  const handleOpenAccountMenu = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    setAccountAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseAccountMenu = () => {
+    setAccountAnchorEl(null);
+  };
+
   const categories = [
     { name: "Electrónica", icon: "💻" },
     { name: "Ropa y accesorios", icon: "👗" },
@@ -524,25 +536,47 @@ export function Navbar(): ReactNode {
                 onClick={() => {}}
               />
 
+              {/* Mostrar texto de bienvenida si está autenticado */}
               {auth.isAuthenticated && (
-                <Typography sx={{ fontSize: "14px", colors: Colors.BLACK }}>
-                  {" "}
-                  {
-                    `${auth.user?.profile.given_name} ${auth.user?.profile.family_name}`!
-                  }
+                <Typography sx={{ fontSize: "14px", color: Colors.BLACK }}>
+                  Bienvenido: {`${auth.user?.profile.given_name} ${auth.user?.profile.family_name}`}
                 </Typography>
               )}
 
-              {!auth.isAuthenticated && (
-                <NavbarIconButton
-                  icon={<AccountCircleOutlinedIcon />}
-                  badgedCount={0}
-                  tooltipTitle="Cuenta de usuario"
-                  onClick={() => {
-                    navigate("register");
+              {/* Botón de cuenta - abre un menú con opciones */}
+              <NavbarIconButton
+                icon={<AccountCircleOutlinedIcon />}
+                badgedCount={0}
+                tooltipTitle="Cuenta de usuario"
+                onClick={handleOpenAccountMenu}
+              />
+
+              <Menu
+                anchorEl={accountAnchorEl}
+                open={Boolean(accountAnchorEl)}
+                onClose={handleCloseAccountMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCloseAccountMenu();
+                    navigate('/register');
                   }}
-                />
-              )}
+                >
+                  Crear usuario
+                </MenuItem>
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCloseAccountMenu();
+                    navigate('/user');
+                  }}
+                >
+                  Perfil de usuario
+                </MenuItem>
+              </Menu>
             </NavbarChildContainer>
           </RowStack>
         )}
@@ -625,7 +659,7 @@ export function Navbar(): ReactNode {
               borderRadius: 2,
             }}
           >
-            {categories.map((cat, idx) => (
+            {categories.map((cat) => (
               <ListItem key={cat.name} disableGutters sx={{ mb: 1, px: 0 }}>
                 <Box
                   sx={{
@@ -724,9 +758,9 @@ export function Navbar(): ReactNode {
               borderRadius: 2,
             }}
           >
-            {notifications.map((notif, idx) => (
+            {notifications.map((notif) => (
               <ListItem
-                key={notif.title + idx}
+                key={notif.title}
                 disableGutters
                 sx={{ mb: 1, px: 0 }}
               >
