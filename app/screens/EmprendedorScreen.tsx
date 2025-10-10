@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -16,6 +16,7 @@ import {
   Paper,
   IconButton,
   useTheme,
+  Dialog,
 } from "@mui/material";
 import {
   TrendingUp,
@@ -32,6 +33,7 @@ import {
   Visibility,
   Add,
 } from "@mui/icons-material";
+import CreateStoreForm from '../features/store/StoreForm';
 
 // 🔹 Tipos TypeScript
 interface MetricCardProps {
@@ -226,6 +228,7 @@ const FinanceCard: React.FC<FinanceCardProps> = ({ value, label, color, bgcolor 
 
 export default function EmprendedorScreen() {
   const theme = useTheme();
+  const [openEdit, setOpenEdit] = useState(false);
 
   return (
     <Box
@@ -239,7 +242,7 @@ export default function EmprendedorScreen() {
         variant="h4"
         sx={{ mb: 3, color: theme.palette.primary.main, fontWeight: "bold" }}
       >
-        Dashboard del Emprendedor
+        Dashboard
       </Typography>
 
       {/* Métricas Principales */}
@@ -578,6 +581,7 @@ export default function EmprendedorScreen() {
               fullWidth
               sx={{ py: 2 }}
               startIcon={<Edit />}
+              onClick={() => setOpenEdit(true)}
             >
               Editar Perfil
             </Button>
@@ -608,6 +612,10 @@ export default function EmprendedorScreen() {
           </Box>
         </CardContent>
       </Card>
+
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="md" fullWidth>
+        <CreateStoreForm />
+      </Dialog>
     </Box>
   );
 }

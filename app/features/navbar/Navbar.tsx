@@ -497,7 +497,7 @@ export function Navbar(): ReactNode {
               />
               <NavbarButton
                 title={"Reseñas"}
-                onClick={() => {}}
+                onClick={() => navigate("/stores")}
                 starIcon={<ReviewsOutlinedIcon />}
               />
             </NavbarChildContainer>
@@ -526,7 +526,7 @@ export function Navbar(): ReactNode {
 
               {auth.isAuthenticated && (
                 <Typography sx={{ fontSize: "14px", colors: Colors.BLACK }}>
-                  Bienvenido:{" "}
+                  {" "}
                   {
                     `${auth.user?.profile.given_name} ${auth.user?.profile.family_name}`!
                   }

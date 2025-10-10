@@ -6,6 +6,8 @@ export default [
       index("./screens/HomeScreen.tsx"),
       route("about", "./screens/AboutScreen.tsx"),
       route("register", "./screens/RegisterScreen.tsx"),
+      route("stores", "./screens/StoresScreen.tsx"),
+      route("products", "./screens/ProductsScreen.tsx"),
     ]),
 
     layout("./layouts/PrivateLayout.tsx", [

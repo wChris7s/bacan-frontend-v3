@@ -61,6 +61,7 @@ export default function HomeScreen() {
             <Button
               variant="contained"
               size="large"
+              onClick={() => navigate("/products")}
               sx={{
                 fontWeight: 700,
                 fontSize: 18,
