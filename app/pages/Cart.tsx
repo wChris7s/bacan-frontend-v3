@@ -11,12 +11,33 @@ import {
   Divider,
   Grid,
   IconButton,
+  keyframes,
   Typography,
 } from "@mui/material";
-import { Add, Delete, Remove, ShoppingBag } from "@mui/icons-material";
+import {
+  Add,
+  ArrowBack,
+  CreditCard,
+  Delete,
+  LocalShipping,
+  Remove,
+  Security,
+  ShoppingBag,
+} from "@mui/icons-material";
 import { apiClient } from "~/lib/api/client";
 import { useAuthStore } from "~/store/authStore";
 import { useCartStore } from "~/store/cartStore";
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -90,8 +111,19 @@ export default function Cart() {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-        <CircularProgress />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "calc(100vh - 70px)",
+          bgcolor: "#fafafa",
+        }}
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <CircularProgress sx={{ color: "black", mb: 2 }} size={48} />
+          <Typography color="text.secondary">Loading cart...</Typography>
+        </Box>
       </Box>
     );
   }
@@ -99,39 +131,69 @@ export default function Cart() {
   if (!cart || cart.items.length === 0) {
     return (
       <Box sx={{ bgcolor: "#fafafa", minHeight: "calc(100vh - 70px)" }}>
-        <Container maxWidth="md" sx={{ py: 12, textAlign: "center" }}>
+        <Container maxWidth="md" sx={{ py: 12 }}>
           <Box
             sx={{
               bgcolor: "white",
-              p: 6,
-              borderRadius: 3,
-              border: "1px solid #f0f0f0",
+              p: { xs: 5, md: 8 },
+              borderRadius: 5,
+              border: "1px solid rgba(0,0,0,0.06)",
+              boxShadow: "0px 12px 40px rgba(0,0,0,0.06)",
+              textAlign: "center",
+              animation: `${fadeInUp} 0.6s ease-out`,
             }}
           >
-            <ShoppingBag
-              sx={{ fontSize: 100, color: "text.secondary", mb: 3 }}
-            />
-            <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
+            <Box
+              sx={{
+                width: 120,
+                height: 120,
+                borderRadius: "50%",
+                bgcolor: "rgba(0,0,0,0.03)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mx: "auto",
+                mb: 4,
+              }}
+            >
+              <ShoppingBag sx={{ fontSize: 60, color: "text.secondary" }} />
+            </Box>
+            <Typography
+              variant="h3"
+              gutterBottom
+              sx={{
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+              }}
+            >
               Your cart is empty
             </Typography>
             <Typography
               color="text.secondary"
               paragraph
-              sx={{ fontSize: "1.1rem", mb: 4 }}
+              sx={{ fontSize: "1.15rem", mb: 5, maxWidth: 400, mx: "auto" }}
             >
-              Start shopping to add items to your cart
+              Looks like you haven't added anything to your cart yet. Start
+              browsing to find great products!
             </Typography>
             <Button
               variant="contained"
               size="large"
+              startIcon={<ArrowBack />}
               onClick={() => navigate("/products")}
               sx={{
                 px: 5,
-                py: 1.5,
+                py: 1.8,
                 fontSize: "1rem",
+                fontWeight: 700,
                 bgcolor: "black",
+                borderRadius: 3,
+                boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
+                transition: "all 0.3s ease",
                 "&:hover": {
-                  bgcolor: "#333",
+                  bgcolor: "#1a1a1a",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0px 12px 32px rgba(0,0,0,0.25)",
                 },
               }}
             >
@@ -145,166 +207,246 @@ export default function Cart() {
 
   return (
     <Box sx={{ bgcolor: "#fafafa", minHeight: "calc(100vh - 70px)" }}>
-      <Container maxWidth="lg" sx={{ py: 5 }}>
-        <Typography
-          variant="h2"
-          gutterBottom
+      {/* Header */}
+      <Box
+        sx={{
+          bgcolor: "black",
+          color: "white",
+          py: { xs: 5, md: 6 },
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <Box
           sx={{
-            fontWeight: 700,
-            mb: 4,
-            fontSize: { xs: "2rem", md: "3rem" },
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+            `,
+            backgroundSize: "50px 50px",
           }}
-        >
-          Shopping Cart
-        </Typography>
+        />
+        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: "2rem", md: "2.75rem" },
+              letterSpacing: "-0.03em",
+              animation: `${fadeInUp} 0.6s ease-out`,
+            }}
+          >
+            Shopping Cart
+          </Typography>
+          <Typography
+            sx={{
+              mt: 1,
+              opacity: 0.7,
+              fontSize: "1.1rem",
+              animation: `${fadeInUp} 0.6s ease-out 0.1s both`,
+            }}
+          >
+            {cart.totalItems} item{cart.totalItems !== 1 ? "s" : ""} in your
+            cart
+          </Typography>
+        </Container>
+      </Box>
 
+      <Container maxWidth="lg" sx={{ py: 5 }}>
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 8 }}>
-            {cart.items.map((item) => (
-              <Card
-                key={item.externalId}
-                sx={{
-                  mb: 2,
-                  bgcolor: "white",
-                  border: "1px solid #f0f0f0",
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Grid container spacing={3} alignItems="center">
-                    <Grid size={{ xs: 12, sm: 3 }}>
-                      <Box
-                        component="img"
-                        src={
-                          item.product.imageUrl ||
-                          "https://via.placeholder.com/150"
-                        }
-                        alt={item.product.name}
-                        sx={{
-                          width: "100%",
-                          height: 120,
-                          objectFit: "cover",
-                          borderRadius: 2,
-                        }}
-                      />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 5 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: 600, mb: 0.5 }}
-                      >
-                        {item.product.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 1 }}
-                      >
-                        {item.product.ventureName}
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: 700, color: "black" }}
-                      >
-                        ${item.product.price.toFixed(2)}
-                      </Typography>
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 3 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border: "2px solid #f0f0f0",
-                          borderRadius: 2,
-                          p: 0.5,
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.externalId,
-                              item.quantity,
-                              -1
-                            )
+          {/* Cart Items */}
+          <Grid size={{ xs: 12, lg: 8 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {cart.items.map((item, index) => (
+                <Card
+                  key={item.externalId}
+                  sx={{
+                    bgcolor: "white",
+                    border: "1px solid rgba(0,0,0,0.06)",
+                    borderRadius: 4,
+                    overflow: "hidden",
+                    transition: "all 0.3s ease",
+                    animation: `${fadeInUp} 0.5s ease-out ${0.1 * index}s both`,
+                    "&:hover": {
+                      boxShadow: "0px 8px 24px rgba(0,0,0,0.08)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Grid container spacing={3} alignItems="center">
+                      <Grid size={{ xs: 12, sm: 3 }}>
+                        <Box
+                          component="img"
+                          src={
+                            item.product.imageUrl ||
+                            "https://via.placeholder.com/150"
                           }
-                          disabled={updateQuantityMutation.isPending}
-                        >
-                          <Remove />
-                        </IconButton>
-                        <Typography
+                          alt={item.product.name}
                           sx={{
-                            mx: 3,
-                            minWidth: 40,
-                            textAlign: "center",
-                            fontWeight: 600,
-                            fontSize: "1.1rem",
+                            width: "100%",
+                            height: 130,
+                            objectFit: "cover",
+                            borderRadius: 3,
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 5 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            mb: 0.5,
+                            letterSpacing: "-0.01em",
                           }}
                         >
-                          {item.quantity}
+                          {item.product.name}
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.externalId,
-                              item.quantity,
-                              1
-                            )
-                          }
-                          disabled={
-                            updateQuantityMutation.isPending ||
-                            item.quantity >= item.product.stock
-                          }
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            mb: 1.5,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
                         >
-                          <Add />
-                        </IconButton>
-                      </Box>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        textAlign="center"
-                        sx={{ mt: 1, fontWeight: 600 }}
-                      >
-                        Subtotal: ${item.subtotal.toFixed(2)}
-                      </Typography>
-                    </Grid>
+                          {item.product.ventureName}
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 800, color: "black" }}
+                        >
+                          ${item.product.price.toFixed(2)}
+                        </Typography>
+                      </Grid>
 
-                    <Grid size={{ xs: 12, sm: 1 }}>
-                      <IconButton
-                        sx={{
-                          color: "error.main",
-                          "&:hover": {
-                            bgcolor: "error.light",
-                            color: "error.dark",
-                          },
-                        }}
-                        onClick={() =>
-                          removeItemMutation.mutate(item.externalId)
-                        }
-                        disabled={removeItemMutation.isPending}
-                      >
-                        <Delete />
-                      </IconButton>
+                      <Grid size={{ xs: 12, sm: 3 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            bgcolor: "rgba(0,0,0,0.03)",
+                            borderRadius: 3,
+                            p: 0.5,
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.externalId,
+                                item.quantity,
+                                -1
+                              )
+                            }
+                            disabled={
+                              updateQuantityMutation.isPending ||
+                              item.quantity <= 1
+                            }
+                            sx={{
+                              bgcolor: "white",
+                              boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+                              "&:hover": {
+                                bgcolor: "white",
+                              },
+                            }}
+                          >
+                            <Remove fontSize="small" />
+                          </IconButton>
+                          <Typography
+                            sx={{
+                              mx: 3,
+                              minWidth: 40,
+                              textAlign: "center",
+                              fontWeight: 700,
+                              fontSize: "1.1rem",
+                            }}
+                          >
+                            {item.quantity}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.externalId,
+                                item.quantity,
+                                1
+                              )
+                            }
+                            disabled={
+                              updateQuantityMutation.isPending ||
+                              item.quantity >= item.product.stock
+                            }
+                            sx={{
+                              bgcolor: "white",
+                              boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+                              "&:hover": {
+                                bgcolor: "white",
+                              },
+                            }}
+                          >
+                            <Add fontSize="small" />
+                          </IconButton>
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          textAlign="center"
+                          sx={{ mt: 1.5, fontWeight: 600 }}
+                        >
+                          Subtotal:{" "}
+                          <Box component="span" sx={{ color: "black" }}>
+                            ${item.subtotal.toFixed(2)}
+                          </Box>
+                        </Typography>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 1 }}>
+                        <IconButton
+                          sx={{
+                            color: "error.main",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              bgcolor: "rgba(239,68,68,0.1)",
+                              transform: "scale(1.1)",
+                            },
+                          }}
+                          onClick={() =>
+                            removeItemMutation.mutate(item.externalId)
+                          }
+                          disabled={removeItemMutation.isPending}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
 
             <Button
               variant="outlined"
               onClick={() => clearCartMutation.mutate()}
               disabled={clearCartMutation.isPending}
+              startIcon={<Delete />}
               sx={{
-                mt: 2,
+                mt: 3,
                 color: "error.main",
                 borderColor: "error.main",
+                borderRadius: 3,
+                px: 3,
+                py: 1.2,
+                fontWeight: 600,
+                transition: "all 0.3s ease",
                 "&:hover": {
                   borderColor: "error.dark",
-                  bgcolor: "error.light",
+                  bgcolor: "rgba(239,68,68,0.05)",
                 },
               }}
             >
@@ -312,21 +454,32 @@ export default function Cart() {
             </Button>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          {/* Order Summary */}
+          <Grid size={{ xs: 12, lg: 4 }}>
             <Card
               sx={{
                 position: "sticky",
-                top: 90,
+                top: 100,
                 bgcolor: "white",
-                border: "1px solid #f0f0f0",
+                border: "1px solid rgba(0,0,0,0.06)",
+                borderRadius: 4,
+                overflow: "hidden",
+                animation: `${fadeInUp} 0.6s ease-out 0.2s both`,
               }}
             >
-              <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
+              <Box
+                sx={{
+                  bgcolor: "black",
+                  color: "white",
+                  p: 3,
+                }}
+              >
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
                   Order Summary
                 </Typography>
-                <Divider sx={{ my: 3 }} />
+              </Box>
 
+              <CardContent sx={{ p: 4 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -334,8 +487,10 @@ export default function Cart() {
                     mb: 2,
                   }}
                 >
-                  <Typography sx={{ fontSize: "1rem" }}>
-                    Items ({cart.totalItems}):
+                  <Typography
+                    sx={{ fontSize: "1rem", color: "text.secondary" }}
+                  >
+                    Subtotal ({cart.totalItems} items)
                   </Typography>
                   <Typography sx={{ fontWeight: 600 }}>
                     ${cart.total.toFixed(2)}
@@ -349,7 +504,11 @@ export default function Cart() {
                     mb: 3,
                   }}
                 >
-                  <Typography sx={{ fontSize: "1rem" }}>Shipping:</Typography>
+                  <Typography
+                    sx={{ fontSize: "1rem", color: "text.secondary" }}
+                  >
+                    Shipping
+                  </Typography>
                   <Typography sx={{ fontWeight: 600, color: "success.main" }}>
                     Free
                   </Typography>
@@ -365,13 +524,14 @@ export default function Cart() {
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    Total:
+                    Total
                   </Typography>
                   <Typography
                     variant="h5"
                     sx={{
-                      fontWeight: 700,
+                      fontWeight: 800,
                       color: "black",
+                      letterSpacing: "-0.02em",
                     }}
                   >
                     ${cart.total.toFixed(2)}
@@ -384,17 +544,56 @@ export default function Cart() {
                   fullWidth
                   onClick={handleCheckout}
                   sx={{
-                    py: 1.5,
-                    fontSize: "1rem",
-                    fontWeight: 600,
+                    py: 1.8,
+                    fontSize: "1.05rem",
+                    fontWeight: 700,
                     bgcolor: "black",
+                    borderRadius: 3,
+                    boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
+                    transition: "all 0.3s ease",
                     "&:hover": {
-                      bgcolor: "#333",
+                      bgcolor: "#1a1a1a",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0px 12px 32px rgba(0,0,0,0.25)",
                     },
                   }}
                 >
                   Proceed to Checkout
                 </Button>
+
+                {/* Trust badges */}
+                <Box
+                  sx={{
+                    mt: 4,
+                    pt: 3,
+                    borderTop: "1px solid",
+                    borderColor: "divider",
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
+                    {[
+                      { icon: <Security />, text: "Secure checkout" },
+                      { icon: <LocalShipping />, text: "Free shipping" },
+                      { icon: <CreditCard />, text: "Safe payment" },
+                    ].map((item, index) => (
+                      <Box
+                        key={index}
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                      >
+                        <Box sx={{ color: "text.secondary" }}>{item.icon}</Box>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500 }}
+                        >
+                          {item.text}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
           </Grid>

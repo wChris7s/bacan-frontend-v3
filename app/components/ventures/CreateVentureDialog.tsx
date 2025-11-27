@@ -13,11 +13,21 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
+import {
+  Category,
+  Close,
+  Description,
+  Image,
+  Store,
+} from "@mui/icons-material";
 import { apiClient } from "~/lib/api/client";
 import { useAuthStore } from "~/store/authStore";
 
@@ -94,13 +104,79 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
     onClose();
   };
 
+  const textFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      transition: "all 0.3s ease",
+      "&:hover": {
+        boxShadow: "0px 2px 8px rgba(0,0,0,0.06)",
+      },
+      "&.Mui-focused": {
+        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+      },
+    },
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          boxShadow: "0px 24px 48px rgba(0,0,0,0.2)",
+        },
+      }}
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle>Create New Venture</DialogTitle>
-        <DialogContent>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pb: 1,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 2,
+                bgcolor: "black",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+              }}
+            >
+              <Store />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Create New Venture
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Start selling your products
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={handleClose} size="small">
+            <Close />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ pt: 3 }}>
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert
+              severity="error"
+              sx={{
+                mb: 3,
+                borderRadius: 2,
+              }}
+            >
               {error}
             </Alert>
           )}
@@ -112,6 +188,14 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
             margin="normal"
             error={!!errors.name}
             helperText={errors.name?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Store sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyles}
           />
 
           <TextField
@@ -123,6 +207,17 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
             rows={3}
             error={!!errors.description}
             helperText={errors.description?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment
+                  position="start"
+                  sx={{ alignSelf: "flex-start", mt: 1.5 }}
+                >
+                  <Description sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyles}
           />
 
           <TextField
@@ -132,6 +227,14 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
             margin="normal"
             error={!!errors.imageUrl}
             helperText={errors.imageUrl?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Image sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyles}
           />
 
           <FormControl
@@ -153,11 +256,35 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                       (c) => c.externalId === value
                     );
                     return (
-                      <Chip key={value} label={category?.name} size="small" />
+                      <Chip
+                        key={value}
+                        label={category?.name}
+                        size="small"
+                        sx={{
+                          bgcolor: "black",
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: "0.75rem",
+                        }}
+                      />
                     );
                   })}
                 </Box>
               )}
+              sx={{
+                borderRadius: 2.5,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  transition: "all 0.3s ease",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  boxShadow: "0px 2px 8px rgba(0,0,0,0.06)",
+                },
+              }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Category sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              }
             >
               {categories.map((category) => (
                 <MenuItem key={category.externalId} value={category.externalId}>
@@ -166,17 +293,50 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
               ))}
             </Select>
             {errors.categoryExternalIds && (
-              <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: 0.5 }}>
+              <Typography
+                sx={{
+                  color: "error.main",
+                  fontSize: "0.75rem",
+                  mt: 0.5,
+                  ml: 1.5,
+                }}
+              >
                 {errors.categoryExternalIds.message}
-              </Box>
+              </Typography>
             )}
           </FormControl>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>
+
+        <DialogActions sx={{ p: 3, pt: 1, gap: 1.5 }}>
+          <Button
+            onClick={handleClose}
+            disabled={loading}
+            sx={{
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              borderRadius: 2,
+              color: "text.secondary",
+            }}
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading}
+            sx={{
+              px: 4,
+              py: 1,
+              fontWeight: 700,
+              bgcolor: "black",
+              borderRadius: 2,
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+              "&:hover": {
+                bgcolor: "#1a1a1a",
+              },
+            }}
+          >
             {loading ? "Creating..." : "Create Venture"}
           </Button>
         </DialogActions>

@@ -13,11 +13,25 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  Grid,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
+import {
+  AttachMoney,
+  Category,
+  Close,
+  Description,
+  Image,
+  Inventory,
+  Numbers,
+  Store,
+} from "@mui/icons-material";
 import { apiClient } from "~/lib/api/client";
 import { Venture } from "~/lib/api/types";
 
@@ -103,13 +117,79 @@ export function CreateProductDialog({
     onClose();
   };
 
+  const textFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2.5,
+      transition: "all 0.3s ease",
+      "&:hover": {
+        boxShadow: "0px 2px 8px rgba(0,0,0,0.06)",
+      },
+      "&.Mui-focused": {
+        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+      },
+    },
+  };
+
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          boxShadow: "0px 24px 48px rgba(0,0,0,0.2)",
+        },
+      }}
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle>Create New Product</DialogTitle>
-        <DialogContent>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            pb: 1,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 2,
+                bgcolor: "black",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+              }}
+            >
+              <Inventory />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Create New Product
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Add a product to your venture
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={handleClose} size="small">
+            <Close />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ pt: 3 }}>
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert
+              severity="error"
+              sx={{
+                mb: 3,
+                borderRadius: 2,
+              }}
+            >
               {error}
             </Alert>
           )}
@@ -120,7 +200,18 @@ export function CreateProductDialog({
             error={!!errors.ventureExternalId}
           >
             <InputLabel>Venture</InputLabel>
-            <Select {...register("ventureExternalId")} label="Venture">
+            <Select
+              {...register("ventureExternalId")}
+              label="Venture"
+              sx={{
+                borderRadius: 2.5,
+              }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Store sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              }
+            >
               {ventures.map((venture) => (
                 <MenuItem key={venture.externalId} value={venture.externalId}>
                   {venture.name}
@@ -128,9 +219,16 @@ export function CreateProductDialog({
               ))}
             </Select>
             {errors.ventureExternalId && (
-              <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: 0.5 }}>
+              <Typography
+                sx={{
+                  color: "error.main",
+                  fontSize: "0.75rem",
+                  mt: 0.5,
+                  ml: 1.5,
+                }}
+              >
                 {errors.ventureExternalId.message}
-              </Box>
+              </Typography>
             )}
           </FormControl>
 
@@ -141,6 +239,14 @@ export function CreateProductDialog({
             margin="normal"
             error={!!errors.name}
             helperText={errors.name?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Inventory sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyles}
           />
 
           <TextField
@@ -150,31 +256,61 @@ export function CreateProductDialog({
             margin="normal"
             multiline
             rows={3}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment
+                  position="start"
+                  sx={{ alignSelf: "flex-start", mt: 1.5 }}
+                >
+                  <Description sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyles}
           />
 
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <TextField
-              {...register("price", { valueAsNumber: true })}
-              label="Price"
-              type="number"
-              fullWidth
-              margin="normal"
-              error={!!errors.price}
-              helperText={errors.price?.message}
-              inputProps={{ step: "0.01", min: "0" }}
-            />
-
-            <TextField
-              {...register("stock", { valueAsNumber: true })}
-              label="Stock"
-              type="number"
-              fullWidth
-              margin="normal"
-              error={!!errors.stock}
-              helperText={errors.stock?.message}
-              inputProps={{ min: "0" }}
-            />
-          </Box>
+          <Grid container spacing={2} sx={{ mt: 0 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...register("price", { valueAsNumber: true })}
+                label="Price"
+                type="number"
+                fullWidth
+                error={!!errors.price}
+                helperText={errors.price?.message}
+                inputProps={{ step: "0.01", min: "0" }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AttachMoney
+                        sx={{ color: "text.secondary", fontSize: 20 }}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={textFieldStyles}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...register("stock", { valueAsNumber: true })}
+                label="Stock"
+                type="number"
+                fullWidth
+                error={!!errors.stock}
+                helperText={errors.stock?.message}
+                inputProps={{ min: "0" }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Numbers sx={{ color: "text.secondary", fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={textFieldStyles}
+              />
+            </Grid>
+          </Grid>
 
           <TextField
             {...register("imageUrl")}
@@ -183,6 +319,14 @@ export function CreateProductDialog({
             margin="normal"
             error={!!errors.imageUrl}
             helperText={errors.imageUrl?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Image sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={textFieldStyles}
           />
 
           <FormControl
@@ -204,11 +348,29 @@ export function CreateProductDialog({
                       (c) => c.externalId === value
                     );
                     return (
-                      <Chip key={value} label={category?.name} size="small" />
+                      <Chip
+                        key={value}
+                        label={category?.name}
+                        size="small"
+                        sx={{
+                          bgcolor: "black",
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: "0.75rem",
+                        }}
+                      />
                     );
                   })}
                 </Box>
               )}
+              sx={{
+                borderRadius: 2.5,
+              }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Category sx={{ color: "text.secondary", fontSize: 20 }} />
+                </InputAdornment>
+              }
             >
               {categories.map((category) => (
                 <MenuItem key={category.externalId} value={category.externalId}>
@@ -217,17 +379,50 @@ export function CreateProductDialog({
               ))}
             </Select>
             {errors.categoryExternalIds && (
-              <Box sx={{ color: "error.main", fontSize: "0.75rem", mt: 0.5 }}>
+              <Typography
+                sx={{
+                  color: "error.main",
+                  fontSize: "0.75rem",
+                  mt: 0.5,
+                  ml: 1.5,
+                }}
+              >
                 {errors.categoryExternalIds.message}
-              </Box>
+              </Typography>
             )}
           </FormControl>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>
+
+        <DialogActions sx={{ p: 3, pt: 1, gap: 1.5 }}>
+          <Button
+            onClick={handleClose}
+            disabled={loading}
+            sx={{
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              borderRadius: 2,
+              color: "text.secondary",
+            }}
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading}
+            sx={{
+              px: 4,
+              py: 1,
+              fontWeight: 700,
+              bgcolor: "black",
+              borderRadius: 2,
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+              "&:hover": {
+                bgcolor: "#1a1a1a",
+              },
+            }}
+          >
             {loading ? "Creating..." : "Create Product"}
           </Button>
         </DialogActions>
