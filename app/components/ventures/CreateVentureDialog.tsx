@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,6 +17,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Select,
   TextField,
@@ -24,8 +26,9 @@ import {
 import {
   Category,
   Close,
+  CloudUpload,
+  Delete,
   Description,
-  Image,
   Store,
 } from "@mui/icons-material";
 import { apiClient } from "~/lib/api/client";
@@ -34,7 +37,6 @@ import { useAuthStore } from "~/store/authStore";
 const ventureSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   description: z.string().optional(),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   categoryExternalIds: z
     .array(z.string())
     .min(1, "Select at least one category"),
@@ -52,6 +54,10 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
   const user = useAuthStore((state) => state.user);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -74,6 +80,54 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
 
   const selectedCategories = watch("categoryExternalIds");
 
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setError("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.");
+      return;
+    }
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File size exceeds 10MB limit.");
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      setUploadingImage(true);
+      setError(null);
+
+      const response = await apiClient.uploadVentureImage(file);
+      setImageUrl(response.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload image");
+      setImagePreview(null);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageUrl(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const onSubmit = async (data: VentureForm) => {
     if (!user) return;
 
@@ -85,11 +139,11 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
         userExternalId: user.externalId,
         name: data.name,
         description: data.description,
-        imageUrl: data.imageUrl,
+        imageUrl: imageUrl || undefined,
         categoryExternalIds: data.categoryExternalIds,
       });
 
-      reset();
+      handleClose();
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create venture");
@@ -101,6 +155,8 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
   const handleClose = () => {
     reset();
     setError(null);
+    setImageUrl(null);
+    setImagePreview(null);
     onClose();
   };
 
@@ -220,22 +276,116 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
             sx={textFieldStyles}
           />
 
-          <TextField
-            {...register("imageUrl")}
-            label="Image URL (Optional)"
-            fullWidth
-            margin="normal"
-            error={!!errors.imageUrl}
-            helperText={errors.imageUrl?.message}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Image sx={{ color: "text.secondary", fontSize: 20 }} />
-                </InputAdornment>
-              ),
-            }}
-            sx={textFieldStyles}
-          />
+          {/* Image Upload Section */}
+          <Box sx={{ mt: 2, mb: 2 }}>
+            <Typography sx={{ fontWeight: 600, mb: 1, fontSize: "0.9rem" }}>
+              Venture Image (Optional)
+            </Typography>
+
+            {imagePreview ? (
+              <Box
+                sx={{
+                  position: "relative",
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
+                <Box
+                  component="img"
+                  src={imagePreview}
+                  alt="Preview"
+                  sx={{
+                    width: "100%",
+                    height: 200,
+                    objectFit: "cover",
+                  }}
+                />
+                {uploadingImage && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      bgcolor: "rgba(0,0,0,0.5)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: 1,
+                    }}
+                  >
+                    <CircularProgress sx={{ color: "white" }} size={32} />
+                    <Typography sx={{ color: "white", fontSize: "0.9rem" }}>
+                      Uploading...
+                    </Typography>
+                  </Box>
+                )}
+                {!uploadingImage && (
+                  <IconButton
+                    onClick={handleRemoveImage}
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      bgcolor: "rgba(0,0,0,0.6)",
+                      color: "white",
+                      "&:hover": {
+                        bgcolor: "rgba(239,68,68,0.8)",
+                      },
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                )}
+                {uploadingImage && (
+                  <LinearProgress
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                    }}
+                  />
+                )}
+              </Box>
+            ) : (
+              <Box
+                onClick={() => fileInputRef.current?.click()}
+                sx={{
+                  border: "2px dashed",
+                  borderColor: "divider",
+                  borderRadius: 3,
+                  p: 4,
+                  textAlign: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    borderColor: "black",
+                    bgcolor: "rgba(0,0,0,0.02)",
+                  },
+                }}
+              >
+                <CloudUpload
+                  sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
+                />
+                <Typography sx={{ fontWeight: 600 }}>
+                  Click to upload image
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  JPEG, PNG, GIF, WebP (max 10MB)
+                </Typography>
+              </Box>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              onChange={handleImageUpload}
+              style={{ display: "none" }}
+            />
+          </Box>
 
           <FormControl
             fullWidth
@@ -310,7 +460,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
         <DialogActions sx={{ p: 3, pt: 1, gap: 1.5 }}>
           <Button
             onClick={handleClose}
-            disabled={loading}
+            disabled={loading || uploadingImage}
             sx={{
               px: 3,
               py: 1,
@@ -324,7 +474,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
           <Button
             type="submit"
             variant="contained"
-            disabled={loading}
+            disabled={loading || uploadingImage}
             sx={{
               px: 4,
               py: 1,

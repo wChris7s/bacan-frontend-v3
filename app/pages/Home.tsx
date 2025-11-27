@@ -59,7 +59,7 @@ const shimmer = keyframes`
 
 export default function Home() {
   const navigate = useNavigate();
-  const user = useAuthStore((state) => state.user);
+  const { user, isAuthenticated, isEntrepreneur, isCustomer } = useAuthStore();
 
   const features = [
     {
@@ -234,7 +234,7 @@ export default function Home() {
                 animation: `${fadeInUp} 0.8s ease-out 0.3s both`,
               }}
             >
-              {user ? (
+              {isAuthenticated && user ? (
                 <>
                   <Button
                     variant="contained"
@@ -281,14 +281,10 @@ export default function Home() {
                       },
                     }}
                     onClick={() =>
-                      navigate(
-                        user.role === "ENTREPRENEUR" ? "/dashboard" : "/cart"
-                      )
+                      navigate(isEntrepreneur() ? "/dashboard" : "/cart")
                     }
                   >
-                    {user.role === "ENTREPRENEUR"
-                      ? "Go to Dashboard"
-                      : "View Cart"}
+                    {isEntrepreneur() ? "Go to Dashboard" : "View Cart"}
                   </Button>
                 </>
               ) : (
@@ -710,7 +706,7 @@ export default function Home() {
           >
             Join thousands of entrepreneurs building their dreams on Bacan
           </Typography>
-          {!user && (
+          {!isAuthenticated && (
             <Button
               variant="contained"
               size="large"

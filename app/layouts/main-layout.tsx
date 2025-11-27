@@ -1,21 +1,80 @@
+import { useEffect } from "react";
 import { Outlet } from "react-router";
-import { Box } from "@mui/material";
+import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { Navbar } from "~/components/layout/Navbar";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useAuthStore } from "~/store/authStore";
 
-const queryClient = new QueryClient();
+const theme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#000000",
+    },
+    secondary: {
+      main: "#666666",
+    },
+    background: {
+      default: "#ffffff",
+      paper: "#ffffff",
+    },
+  },
+  typography: {
+    fontFamily: [
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Segoe UI"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+    ].join(","),
+  },
+  shape: {
+    borderRadius: 8,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 12,
+          },
+        },
+      },
+    },
+  },
+});
 
 export default function MainLayout() {
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
   return (
-    <QueryClientProvider client={queryClient}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
         <Navbar />
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ flex: 1 }}>
           <Outlet />
         </Box>
       </Box>
-    </QueryClientProvider>
+    </ThemeProvider>
   );
 }

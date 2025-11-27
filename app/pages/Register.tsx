@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,41 +10,63 @@ import {
   Container,
   FormControl,
   FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
   Radio,
   RadioGroup,
   TextField,
   Typography,
-  InputAdornment,
-  Grid,
 } from "@mui/material";
 import {
-  Person,
+  ArrowForward,
   Email,
   LocationOn,
-  ArrowForward,
-  Store,
+  Lock,
+  Person,
   ShoppingBag,
+  Store,
   Storefront,
+  Visibility,
+  VisibilityOff,
 } from "@mui/icons-material";
 import { useAuthStore } from "~/store/authStore";
 import { apiClient } from "~/lib/api/client";
 import { UserRole } from "~/lib/api/types";
 
-const registerSchema = z.object({
-  role: z.enum(["ENTREPRENEUR", "CUSTOMER"]),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  address: z.string().optional(),
-});
+const registerSchema = z
+  .object({
+    role: z.enum(["ENTREPRENEUR", "CUSTOMER"]),
+    firstName: z.string().min(2, "First name must be at least 2 characters"),
+    lastName: z.string().min(2, "Last name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Password must contain at least one special character"
+      ),
+    confirmPassword: z.string(),
+    address: z.string().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
+  const loginWithResponse = useAuthStore((state) => state.loginWithResponse);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -66,18 +88,32 @@ export default function Register() {
       setLoading(true);
       setError(null);
 
-      const user = await apiClient.createUser({
+      // Register the user
+      await apiClient.register({
         role: data.role as UserRole,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
+        password: data.password,
         address: data.address,
       });
 
-      setUser(user);
-      navigate(user.role === UserRole.ENTREPRENEUR ? "/dashboard" : "/products");
+      // Auto-login after registration
+      const loginResponse = await apiClient.login({
+        email: data.email,
+        password: data.password,
+      });
+
+      loginWithResponse(loginResponse);
+
+      // Redirect based on role
+      if (loginResponse.role === UserRole.ENTREPRENEUR) {
+        navigate("/dashboard");
+      } else {
+        navigate("/products");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to register");
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -105,6 +141,7 @@ export default function Register() {
         position: "relative",
         overflow: "hidden",
         background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+        py: 4,
         "&::before": {
           content: '""',
           position: "absolute",
@@ -112,7 +149,8 @@ export default function Register() {
           left: "-10%",
           width: "60%",
           height: "120%",
-          background: "radial-gradient(ellipse, rgba(0,0,0,0.03) 0%, transparent 70%)",
+          background:
+            "radial-gradient(ellipse, rgba(0,0,0,0.03) 0%, transparent 70%)",
           transform: "rotate(15deg)",
         },
         "&::after": {
@@ -122,11 +160,12 @@ export default function Register() {
           right: "-10%",
           width: "50%",
           height: "100%",
-          background: "radial-gradient(ellipse, rgba(0,0,0,0.02) 0%, transparent 70%)",
+          background:
+            "radial-gradient(ellipse, rgba(0,0,0,0.02) 0%, transparent 70%)",
         },
       }}
     >
-      <Container maxWidth="md" sx={{ py: 6, position: "relative", zIndex: 1 }}>
+      <Container maxWidth="md" sx={{ position: "relative", zIndex: 1 }}>
         <Box
           sx={{
             bgcolor: "white",
@@ -179,7 +218,8 @@ export default function Register() {
                     width: 200,
                     height: 200,
                     borderRadius: "50%",
-                    background: "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+                    background:
+                      "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
                   }}
                 />
 
@@ -217,16 +257,22 @@ export default function Register() {
                       mb: 4,
                     }}
                   >
-                    Create your account and start your journey in the modern marketplace.
+                    Create your account and start your journey in the modern
+                    marketplace.
                   </Typography>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
                     {[
                       "Zero commission fees",
                       "Instant account setup",
                       "24/7 customer support",
                     ].map((text, index) => (
-                      <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                      <Box
+                        key={index}
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                      >
                         <Box
                           sx={{
                             width: 20,
@@ -253,8 +299,8 @@ export default function Register() {
 
             {/* Right side - form */}
             <Grid size={{ xs: 12, md: 7 }}>
-              <Box sx={{ p: { xs: 4, sm: 6 } }}>
-                <Box sx={{ mb: 4 }}>
+              <Box sx={{ p: { xs: 4, sm: 5 } }}>
+                <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="h4"
                     sx={{
@@ -284,55 +330,97 @@ export default function Register() {
                   </Alert>
                 )}
 
-                <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit(onSubmit)}
+                  noValidate
+                >
                   {/* Role Selection */}
-                  <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
+                  <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
                     <Typography
-                      sx={{ fontWeight: 600, color: "text.primary", mb: 1.5, fontSize: "0.9rem" }}
+                      sx={{
+                        fontWeight: 600,
+                        color: "text.primary",
+                        mb: 1.5,
+                        fontSize: "0.9rem",
+                      }}
                     >
                       I want to:
                     </Typography>
                     <RadioGroup
                       row
                       value={selectedRole}
-                      onChange={(e) => setValue("role", e.target.value as "ENTREPRENEUR" | "CUSTOMER")}
+                      onChange={(e) =>
+                        setValue(
+                          "role",
+                          e.target.value as "ENTREPRENEUR" | "CUSTOMER"
+                        )
+                      }
                     >
                       <Box
                         onClick={() => setValue("role", "CUSTOMER")}
                         sx={{
                           flex: 1,
                           mr: 1.5,
-                          p: 2.5,
+                          p: 2,
                           border: "2px solid",
-                          borderColor: selectedRole === "CUSTOMER" ? "black" : "divider",
+                          borderColor:
+                            selectedRole === "CUSTOMER" ? "black" : "divider",
                           borderRadius: 3,
                           cursor: "pointer",
                           transition: "all 0.3s ease",
-                          bgcolor: selectedRole === "CUSTOMER" ? "rgba(0,0,0,0.02)" : "transparent",
+                          bgcolor:
+                            selectedRole === "CUSTOMER"
+                              ? "rgba(0,0,0,0.02)"
+                              : "transparent",
                           "&:hover": {
-                            borderColor: selectedRole === "CUSTOMER" ? "black" : "rgba(0,0,0,0.3)",
+                            borderColor:
+                              selectedRole === "CUSTOMER"
+                                ? "black"
+                                : "rgba(0,0,0,0.3)",
                           },
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                          }}
+                        >
                           <ShoppingBag
                             sx={{
                               fontSize: 28,
-                              color: selectedRole === "CUSTOMER" ? "black" : "text.secondary",
+                              color:
+                                selectedRole === "CUSTOMER"
+                                  ? "black"
+                                  : "text.secondary",
                             }}
                           />
                           <Box>
-                            <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                            <Typography
+                              sx={{ fontWeight: 600, fontSize: "0.95rem" }}
+                            >
                               Buy Products
                             </Typography>
-                            <Typography sx={{ fontSize: "0.8rem", color: "text.secondary" }}>
+                            <Typography
+                              sx={{
+                                fontSize: "0.75rem",
+                                color: "text.secondary",
+                              }}
+                            >
                               Shop from entrepreneurs
                             </Typography>
                           </Box>
                         </Box>
                         <FormControlLabel
                           value="CUSTOMER"
-                          control={<Radio {...register("role")} sx={{ display: "none" }} />}
+                          control={
+                            <Radio
+                              {...register("role")}
+                              sx={{ display: "none" }}
+                            />
+                          }
                           label=""
                           sx={{ display: "none" }}
                         />
@@ -342,37 +430,67 @@ export default function Register() {
                         onClick={() => setValue("role", "ENTREPRENEUR")}
                         sx={{
                           flex: 1,
-                          p: 2.5,
+                          p: 2,
                           border: "2px solid",
-                          borderColor: selectedRole === "ENTREPRENEUR" ? "black" : "divider",
+                          borderColor:
+                            selectedRole === "ENTREPRENEUR"
+                              ? "black"
+                              : "divider",
                           borderRadius: 3,
                           cursor: "pointer",
                           transition: "all 0.3s ease",
-                          bgcolor: selectedRole === "ENTREPRENEUR" ? "rgba(0,0,0,0.02)" : "transparent",
+                          bgcolor:
+                            selectedRole === "ENTREPRENEUR"
+                              ? "rgba(0,0,0,0.02)"
+                              : "transparent",
                           "&:hover": {
-                            borderColor: selectedRole === "ENTREPRENEUR" ? "black" : "rgba(0,0,0,0.3)",
+                            borderColor:
+                              selectedRole === "ENTREPRENEUR"
+                                ? "black"
+                                : "rgba(0,0,0,0.3)",
                           },
                         }}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                          }}
+                        >
                           <Store
                             sx={{
                               fontSize: 28,
-                              color: selectedRole === "ENTREPRENEUR" ? "black" : "text.secondary",
+                              color:
+                                selectedRole === "ENTREPRENEUR"
+                                  ? "black"
+                                  : "text.secondary",
                             }}
                           />
                           <Box>
-                            <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                            <Typography
+                              sx={{ fontWeight: 600, fontSize: "0.95rem" }}
+                            >
                               Sell Products
                             </Typography>
-                            <Typography sx={{ fontSize: "0.8rem", color: "text.secondary" }}>
+                            <Typography
+                              sx={{
+                                fontSize: "0.75rem",
+                                color: "text.secondary",
+                              }}
+                            >
                               Start your venture
                             </Typography>
                           </Box>
                         </Box>
                         <FormControlLabel
                           value="ENTREPRENEUR"
-                          control={<Radio {...register("role")} sx={{ display: "none" }} />}
+                          control={
+                            <Radio
+                              {...register("role")}
+                              sx={{ display: "none" }}
+                            />
+                          }
                           label=""
                           sx={{ display: "none" }}
                         />
@@ -391,7 +509,9 @@ export default function Register() {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <Person sx={{ color: "text.secondary", fontSize: 20 }} />
+                              <Person
+                                sx={{ color: "text.secondary", fontSize: 20 }}
+                              />
                             </InputAdornment>
                           ),
                         }}
@@ -408,7 +528,9 @@ export default function Register() {
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <Person sx={{ color: "text.secondary", fontSize: 20 }} />
+                              <Person
+                                sx={{ color: "text.secondary", fontSize: 20 }}
+                              />
                             </InputAdornment>
                           ),
                         }}
@@ -428,7 +550,78 @@ export default function Register() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Email sx={{ color: "text.secondary", fontSize: 20 }} />
+                          <Email
+                            sx={{ color: "text.secondary", fontSize: 20 }}
+                          />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={textFieldStyles}
+                  />
+
+                  <TextField
+                    {...register("password")}
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.password}
+                    helperText={
+                      errors.password?.message ||
+                      "Min 8 chars, uppercase, lowercase, number, special char"
+                    }
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock
+                            sx={{ color: "text.secondary", fontSize: 20 }}
+                          />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={textFieldStyles}
+                  />
+
+                  <TextField
+                    {...register("confirmPassword")}
+                    label="Confirm Password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword?.message}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock
+                            sx={{ color: "text.secondary", fontSize: 20 }}
+                          />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            edge="end"
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
                         </InputAdornment>
                       ),
                     }}
@@ -444,8 +637,13 @@ export default function Register() {
                     rows={2}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ alignSelf: "flex-start", mt: 1.5 }}>
-                          <LocationOn sx={{ color: "text.secondary", fontSize: 20 }} />
+                        <InputAdornment
+                          position="start"
+                          sx={{ alignSelf: "flex-start", mt: 1.5 }}
+                        >
+                          <LocationOn
+                            sx={{ color: "text.secondary", fontSize: 20 }}
+                          />
                         </InputAdornment>
                       ),
                     }}
@@ -460,7 +658,7 @@ export default function Register() {
                     disabled={loading}
                     endIcon={!loading && <ArrowForward />}
                     sx={{
-                      mt: 4,
+                      mt: 3,
                       py: 1.8,
                       fontSize: "1.05rem",
                       fontWeight: 700,
@@ -482,15 +680,18 @@ export default function Register() {
                   </Button>
 
                   <Box sx={{ mt: 3, textAlign: "center" }}>
-                    <Typography color="text.secondary" sx={{ fontSize: "0.95rem" }}>
+                    <Typography
+                      color="text.secondary"
+                      sx={{ fontSize: "0.95rem" }}
+                    >
                       Already have an account?{" "}
                       <Box
-                        component="span"
-                        onClick={() => navigate("/login")}
+                        component={Link}
+                        to="/login"
                         sx={{
                           color: "black",
                           fontWeight: 600,
-                          cursor: "pointer",
+                          textDecoration: "none",
                           transition: "opacity 0.2s ease",
                           "&:hover": {
                             opacity: 0.7,

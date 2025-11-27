@@ -20,6 +20,7 @@ import {
   Close,
   Dashboard,
   Home,
+  Login as LoginIcon,
   Logout,
   Menu as MenuIcon,
   ShoppingCart,
@@ -36,11 +37,14 @@ export function Navbar() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const { user, logout, isEntrepreneur, isCustomer } = useAuthStore();
+  const { user, logout, isEntrepreneur, isCustomer, isAuthenticated } =
+    useAuthStore();
   const cart = useCartStore((state) => state.cart);
+  const clearLocalCart = useCartStore((state) => state.clearLocalCart);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
+    clearLocalCart();
     navigate("/");
     setMobileOpen(false);
   };
@@ -128,6 +132,12 @@ export function Navbar() {
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: 700 }}>
             {user.firstName} {user.lastName}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ opacity: 0.7, fontSize: "0.75rem" }}
+          >
+            {user.email}
           </Typography>
         </Box>
       )}
@@ -315,7 +325,7 @@ export function Navbar() {
             >
               <MenuIcon />
             </IconButton>
-          ) : user ? (
+          ) : isAuthenticated && user ? (
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               <Box
                 sx={{
@@ -412,6 +422,7 @@ export function Navbar() {
             <Box sx={{ display: "flex", gap: 2 }}>
               <Button
                 color="inherit"
+                startIcon={<LoginIcon />}
                 onClick={() => navigate("/login")}
                 sx={{
                   color: "black",
