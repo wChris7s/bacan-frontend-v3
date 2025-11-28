@@ -82,10 +82,10 @@ export default function Login() {
       borderRadius: 3,
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+        boxShadow: "0px 4px 12px rgba(30,58,95,0.1)",
       },
       "&.Mui-focused": {
-        boxShadow: "0px 4px 16px rgba(0,0,0,0.12)",
+        boxShadow: "0px 4px 16px rgba(30,58,95,0.15)",
       },
     },
   };
@@ -106,8 +106,8 @@ export default function Login() {
           sx={{
             bgcolor: "white",
             borderRadius: 5,
-            boxShadow: "0px 24px 80px rgba(0, 0, 0, 0.1)",
-            border: "1px solid rgba(0,0,0,0.05)",
+            boxShadow: "0px 24px 80px rgba(30, 58, 95, 0.12)",
+            border: "1px solid rgba(30,58,95,0.08)",
             overflow: "hidden",
           }}
         >
@@ -154,14 +154,15 @@ export default function Login() {
                       width: 60,
                       height: 60,
                       borderRadius: 3,
-                      bgcolor: "rgba(255,255,255,0.1)",
+                      bgcolor: "secondary.main",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       mb: 4,
+                      boxShadow: "0px 8px 24px rgba(255,152,0,0.3)",
                     }}
                   >
-                    <Storefront sx={{ fontSize: 32 }} />
+                    <Storefront sx={{ fontSize: 32, color: "white" }} />
                   </Box>
 
                   <Typography
@@ -203,11 +204,12 @@ export default function Login() {
                             width: 20,
                             height: 20,
                             borderRadius: "50%",
-                            bgcolor: "rgba(255,152,0,0.5)",
+                            bgcolor: "secondary.main",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontSize: "0.7rem",
+                            color: "white",
                           }}
                         >
                           ✓
@@ -277,7 +279,7 @@ export default function Login() {
                           startAdornment: (
                             <InputAdornment position="start">
                               <Email
-                                sx={{ color: "text.secondary", fontSize: 20 }}
+                                sx={{ color: "primary.main", fontSize: 20 }}
                               />
                             </InputAdornment>
                           ),
@@ -303,7 +305,7 @@ export default function Login() {
                           startAdornment: (
                             <InputAdornment position="start">
                               <Lock
-                                sx={{ color: "text.secondary", fontSize: 20 }}
+                                sx={{ color: "primary.main", fontSize: 20 }}
                               />
                             </InputAdornment>
                           ),

@@ -29,7 +29,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
         transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
           transform: "translateY(-8px)",
-          boxShadow: "0px 20px 40px rgba(0, 0, 0, 0.12)",
+          boxShadow: "0px 20px 40px rgba(30,58,95,0.15)",
           "& .venture-image": {
             transform: "scale(1.08)",
           },
@@ -46,7 +46,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
           height="220"
           image={
             venture.imageUrl ||
-            "https://via.placeholder.com/400x300?text=Venture"
+            "https://via.placeholder.com/400x300?text=Emprendimiento"
           }
           alt={venture.name}
           sx={{
@@ -60,7 +60,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)",
+              "linear-gradient(to top, rgba(30,58,95,0.8) 0%, transparent 60%)",
             opacity: 0,
             transition: "opacity 0.4s ease",
           }}
@@ -73,7 +73,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
             width: 44,
             height: 44,
             borderRadius: 2,
-            bgcolor: "rgba(0,0,0,0.8)",
+            bgcolor: "rgba(30,58,95,0.9)",
             backdropFilter: "blur(10px)",
             display: "flex",
             alignItems: "center",
@@ -92,6 +92,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
             fontWeight: 800,
             mb: 1.5,
             letterSpacing: "-0.02em",
+            color: "primary.main",
           }}
         >
           {venture.name}
@@ -109,7 +110,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
             minHeight: 48,
           }}
         >
-          {venture.description || "No description provided"}
+          {venture.description || "Sin descripción disponible"}
         </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
           {venture.categories.map((category) => (
@@ -118,7 +119,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
               label={category.name}
               size="small"
               sx={{
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 color: "white",
                 fontWeight: 600,
                 fontSize: "0.7rem",
@@ -126,7 +127,7 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
                 borderRadius: 1.5,
                 transition: "all 0.3s ease",
                 "&:hover": {
-                  bgcolor: "#333",
+                  bgcolor: "primary.dark",
                 },
               }}
             />
@@ -144,18 +145,18 @@ export function VentureCard({ venture, onSelect }: VentureCardProps) {
             py: 1.5,
             fontWeight: 700,
             fontSize: "0.95rem",
-            bgcolor: "black",
+            bgcolor: "primary.main",
             borderRadius: 3,
-            boxShadow: "0px 4px 14px rgba(0,0,0,0.15)",
+            boxShadow: "0px 4px 14px rgba(30,58,95,0.25)",
             transition: "all 0.3s ease",
             "&:hover": {
-              bgcolor: "#1a1a1a",
+              bgcolor: "primary.dark",
               transform: "translateY(-2px)",
-              boxShadow: "0px 8px 20px rgba(0,0,0,0.2)",
+              boxShadow: "0px 8px 20px rgba(30,58,95,0.35)",
             },
           }}
         >
-          View Products
+          Ver Productos
         </Button>
       </Box>
     </Card>

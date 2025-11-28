@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
         transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
           transform: "translateY(-6px)",
-          boxShadow: "0px 16px 32px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 16px 32px rgba(30,58,95,0.12)",
           "& .product-image": {
             transform: "scale(1.06)",
           },
@@ -41,7 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
           height="200"
           image={
             product.imageUrl ||
-            "https://via.placeholder.com/400x300?text=Product"
+            "https://via.placeholder.com/400x300?text=Producto"
           }
           alt={product.name}
           sx={{
@@ -65,7 +65,7 @@ export function ProductCard({ product }: ProductCardProps) {
             backdropFilter: "blur(8px)",
           }}
         >
-          {product.stock > 0 ? `${product.stock} in stock` : "Out of Stock"}
+          {product.stock > 0 ? `${product.stock} en stock` : "Agotado"}
         </Box>
         <Box
           sx={{
@@ -75,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
             width: 36,
             height: 36,
             borderRadius: 2,
-            bgcolor: "rgba(0,0,0,0.7)",
+            bgcolor: "rgba(30,58,95,0.85)",
             backdropFilter: "blur(8px)",
             display: "flex",
             alignItems: "center",
@@ -92,7 +92,11 @@ export function ProductCard({ product }: ProductCardProps) {
           variant="h6"
           gutterBottom
           noWrap
-          sx={{ fontWeight: 700, letterSpacing: "-0.01em" }}
+          sx={{
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+            color: "primary.main",
+          }}
         >
           {product.name}
         </Typography>
@@ -110,7 +114,7 @@ export function ProductCard({ product }: ProductCardProps) {
             minHeight: 40,
           }}
         >
-          {product.description?.substring(0, 80) || "No description"}
+          {product.description?.substring(0, 80) || "Sin descripción"}
           {product.description && product.description.length > 80 && "..."}
         </Typography>
 
@@ -121,8 +125,8 @@ export function ProductCard({ product }: ProductCardProps) {
               label={category.name}
               size="small"
               sx={{
-                bgcolor: "rgba(0,0,0,0.06)",
-                color: "text.primary",
+                bgcolor: "rgba(30,58,95,0.1)",
+                color: "primary.main",
                 fontWeight: 600,
                 fontSize: "0.7rem",
                 height: 24,
@@ -135,7 +139,7 @@ export function ProductCard({ product }: ProductCardProps) {
               label={`+${product.categories.length - 2}`}
               size="small"
               sx={{
-                bgcolor: "black",
+                bgcolor: "secondary.main",
                 color: "white",
                 fontWeight: 600,
                 fontSize: "0.7rem",
@@ -159,7 +163,7 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="h5"
             sx={{
               fontWeight: 800,
-              color: "black",
+              color: "secondary.main",
               letterSpacing: "-0.02em",
             }}
           >
@@ -175,7 +179,7 @@ export function ProductCard({ product }: ProductCardProps) {
           >
             {product.stock > 0 && <CheckCircle sx={{ fontSize: 18 }} />}
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {product.stock > 0 ? "Available" : "Unavailable"}
+              {product.stock > 0 ? "Disponible" : "No disponible"}
             </Typography>
           </Box>
         </Box>

@@ -72,7 +72,9 @@ export default function Dashboard() {
 
   if (!user || !isEntrepreneur()) {
     return (
-      <Box sx={{ bgcolor: "#fafafa", minHeight: "calc(100vh - 70px)" }}>
+      <Box
+        sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 70px)" }}
+      >
         <Container maxWidth="md" sx={{ py: 12, textAlign: "center" }}>
           <Box
             sx={{
@@ -83,11 +85,14 @@ export default function Dashboard() {
               boxShadow: "0px 12px 40px rgba(0,0,0,0.06)",
             }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
-              Access Denied
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, mb: 2, color: "primary.main" }}
+            >
+              Acceso Denegado
             </Typography>
             <Typography color="text.secondary" sx={{ fontSize: "1.1rem" }}>
-              This page is only accessible to entrepreneurs
+              Esta página solo es accesible para emprendedores
             </Typography>
           </Box>
         </Container>
@@ -103,46 +108,48 @@ export default function Dashboard() {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "calc(100vh - 70px)",
-          bgcolor: "#fafafa",
+          bgcolor: "background.default",
         }}
       >
         <Box sx={{ textAlign: "center" }}>
-          <CircularProgress sx={{ color: "black", mb: 2 }} size={48} />
-          <Typography color="text.secondary">Loading dashboard...</Typography>
+          <CircularProgress sx={{ color: "primary.main", mb: 2 }} size={48} />
+          <Typography color="text.secondary">Cargando panel...</Typography>
         </Box>
       </Box>
     );
   }
 
   // Calculate stats
-  const totalProducts = ventures.reduce((acc, v) => acc, 0);
   const stats = [
     {
-      label: "Ventures",
+      label: "Emprendimientos",
       value: ventures.length,
       icon: <Store />,
-      color: "#000",
+      color: "#1e3a5f",
     },
     {
-      label: "Products",
+      label: "Productos",
       value: products.length,
       icon: <Inventory />,
-      color: "#333",
+      color: "#2d5a87",
     },
     {
-      label: "Categories",
+      label: "Categorías",
       value: ventures.flatMap((v) => v.categories).length,
       icon: <TrendingUp />,
-      color: "#555",
+      color: "#3d7ab7",
     },
   ];
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "calc(100vh - 70px)" }}>
+    <Box
+      sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 70px)" }}
+    >
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "black",
+          background:
+            "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 40%, #3d7ab7 100%)",
           color: "white",
           py: { xs: 5, md: 6 },
           position: "relative",
@@ -154,8 +161,8 @@ export default function Dashboard() {
             position: "absolute",
             inset: 0,
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+              linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
             `,
             backgroundSize: "50px 50px",
           }}
@@ -180,7 +187,7 @@ export default function Dashboard() {
                   animation: `${fadeInUp} 0.6s ease-out`,
                 }}
               >
-                Welcome back, {user.firstName}!
+                ¡Bienvenido, {user.firstName}!
               </Typography>
               <Typography
                 sx={{
@@ -190,7 +197,7 @@ export default function Dashboard() {
                   animation: `${fadeInUp} 0.6s ease-out 0.1s both`,
                 }}
               >
-                Manage your ventures and products
+                Administra tus emprendimientos y productos
               </Typography>
             </Box>
           </Box>
@@ -236,6 +243,7 @@ export default function Dashboard() {
                         fontWeight: 800,
                         mt: 0.5,
                         letterSpacing: "-0.02em",
+                        color: "primary.main",
                       }}
                     >
                       {stat.value}
@@ -277,7 +285,7 @@ export default function Dashboard() {
             onChange={(_, v) => setTabValue(v)}
             sx={{
               "& .MuiTabs-indicator": {
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 height: 3,
               },
               "& .MuiTab-root": {
@@ -288,15 +296,19 @@ export default function Dashboard() {
                 px: 4,
                 transition: "all 0.3s ease",
                 "&.Mui-selected": {
-                  color: "black",
+                  color: "primary.main",
                 },
               },
             }}
           >
-            <Tab icon={<Store />} label="My Ventures" iconPosition="start" />
+            <Tab
+              icon={<Store />}
+              label="Mis Emprendimientos"
+              iconPosition="start"
+            />
             <Tab
               icon={<Inventory />}
-              label="My Products"
+              label="Mis Productos"
               iconPosition="start"
             />
           </Tabs>
@@ -314,18 +326,18 @@ export default function Dashboard() {
                   px: 4,
                   py: 1.5,
                   fontWeight: 700,
-                  bgcolor: "black",
+                  bgcolor: "primary.main",
                   borderRadius: 3,
-                  boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
+                  boxShadow: "0px 8px 24px rgba(30,58,95,0.3)",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    bgcolor: "#1a1a1a",
+                    bgcolor: "primary.dark",
                     transform: "translateY(-2px)",
-                    boxShadow: "0px 12px 32px rgba(0,0,0,0.25)",
+                    boxShadow: "0px 12px 32px rgba(30,58,95,0.4)",
                   },
                 }}
               >
-                Create New Venture
+                Crear Nuevo Emprendimiento
               </Button>
             </Box>
 
@@ -343,7 +355,7 @@ export default function Dashboard() {
                       width: 100,
                       height: 100,
                       borderRadius: "50%",
-                      bgcolor: "rgba(0,0,0,0.03)",
+                      bgcolor: "rgba(30,58,95,0.08)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -351,22 +363,22 @@ export default function Dashboard() {
                       mb: 3,
                     }}
                   >
-                    <Store sx={{ fontSize: 50, color: "text.secondary" }} />
+                    <Store sx={{ fontSize: 50, color: "primary.main" }} />
                   </Box>
                   <Typography
                     variant="h5"
                     gutterBottom
-                    sx={{ fontWeight: 700 }}
+                    sx={{ fontWeight: 700, color: "primary.main" }}
                   >
-                    No ventures yet
+                    Aún no tienes emprendimientos
                   </Typography>
                   <Typography
                     color="text.secondary"
                     paragraph
                     sx={{ mb: 4, maxWidth: 400, mx: "auto" }}
                   >
-                    Create your first venture to start selling and grow your
-                    business
+                    Crea tu primer emprendimiento para comenzar a vender y hacer
+                    crecer tu negocio
                   </Typography>
                   <Button
                     variant="contained"
@@ -376,14 +388,14 @@ export default function Dashboard() {
                       px: 4,
                       py: 1.5,
                       fontWeight: 700,
-                      bgcolor: "black",
+                      bgcolor: "primary.main",
                       borderRadius: 3,
                       "&:hover": {
-                        bgcolor: "#1a1a1a",
+                        bgcolor: "primary.dark",
                       },
                     }}
                   >
-                    Create Venture
+                    Crear Emprendimiento
                   </Button>
                 </CardContent>
               </Card>
@@ -432,21 +444,21 @@ export default function Dashboard() {
                   px: 4,
                   py: 1.5,
                   fontWeight: 700,
-                  bgcolor: "black",
+                  bgcolor: "primary.main",
                   borderRadius: 3,
-                  boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
+                  boxShadow: "0px 8px 24px rgba(30,58,95,0.3)",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    bgcolor: "#1a1a1a",
+                    bgcolor: "primary.dark",
                     transform: "translateY(-2px)",
-                    boxShadow: "0px 12px 32px rgba(0,0,0,0.25)",
+                    boxShadow: "0px 12px 32px rgba(30,58,95,0.4)",
                   },
                   "&:disabled": {
                     bgcolor: "#e0e0e0",
                   },
                 }}
               >
-                Create New Product
+                Crear Nuevo Producto
               </Button>
               {ventures.length === 0 && (
                 <Typography
@@ -454,7 +466,7 @@ export default function Dashboard() {
                   color="error"
                   sx={{ fontWeight: 500 }}
                 >
-                  Create a venture first before adding products
+                  Crea un emprendimiento primero antes de agregar productos
                 </Typography>
               )}
             </Box>
@@ -462,7 +474,7 @@ export default function Dashboard() {
             {selectedVenture ? (
               productsLoading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                  <CircularProgress sx={{ color: "black" }} size={48} />
+                  <CircularProgress sx={{ color: "primary.main" }} size={48} />
                 </Box>
               ) : products.length === 0 ? (
                 <Card
@@ -478,7 +490,7 @@ export default function Dashboard() {
                         width: 100,
                         height: 100,
                         borderRadius: "50%",
-                        bgcolor: "rgba(0,0,0,0.03)",
+                        bgcolor: "rgba(30,58,95,0.08)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -486,23 +498,21 @@ export default function Dashboard() {
                         mb: 3,
                       }}
                     >
-                      <Inventory
-                        sx={{ fontSize: 50, color: "text.secondary" }}
-                      />
+                      <Inventory sx={{ fontSize: 50, color: "primary.main" }} />
                     </Box>
                     <Typography
                       variant="h5"
                       gutterBottom
-                      sx={{ fontWeight: 700 }}
+                      sx={{ fontWeight: 700, color: "primary.main" }}
                     >
-                      No products in this venture
+                      No hay productos en este emprendimiento
                     </Typography>
                     <Typography
                       color="text.secondary"
                       paragraph
                       sx={{ mb: 4, maxWidth: 400, mx: "auto" }}
                     >
-                      Add your first product to start selling
+                      Agrega tu primer producto para comenzar a vender
                     </Typography>
                     <Button
                       variant="contained"
@@ -512,14 +522,14 @@ export default function Dashboard() {
                         px: 4,
                         py: 1.5,
                         fontWeight: 700,
-                        bgcolor: "black",
+                        bgcolor: "primary.main",
                         borderRadius: 3,
                         "&:hover": {
-                          bgcolor: "#1a1a1a",
+                          bgcolor: "primary.dark",
                         },
                       }}
                     >
-                      Add Product
+                      Agregar Producto
                     </Button>
                   </CardContent>
                 </Card>
@@ -552,7 +562,7 @@ export default function Dashboard() {
                       width: 100,
                       height: 100,
                       borderRadius: "50%",
-                      bgcolor: "rgba(0,0,0,0.03)",
+                      bgcolor: "rgba(30,58,95,0.08)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -561,18 +571,18 @@ export default function Dashboard() {
                     }}
                   >
                     <ShoppingCart
-                      sx={{ fontSize: 50, color: "text.secondary" }}
+                      sx={{ fontSize: 50, color: "primary.main" }}
                     />
                   </Box>
                   <Typography
                     variant="h5"
                     gutterBottom
-                    sx={{ fontWeight: 700 }}
+                    sx={{ fontWeight: 700, color: "primary.main" }}
                   >
-                    Select a venture to view products
+                    Selecciona un emprendimiento para ver productos
                   </Typography>
                   <Typography color="text.secondary">
-                    Go to "My Ventures" tab and click on a venture
+                    Ve a la pestaña "Mis Emprendimientos" y haz clic en uno
                   </Typography>
                 </CardContent>
               </Card>

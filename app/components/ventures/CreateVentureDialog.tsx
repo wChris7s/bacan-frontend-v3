@@ -35,11 +35,11 @@ import { apiClient } from "~/lib/api/client";
 import { useAuthStore } from "~/store/authStore";
 
 const ventureSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
+  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
   description: z.string().optional(),
   categoryExternalIds: z
     .array(z.string())
-    .min(1, "Select at least one category"),
+    .min(1, "Selecciona al menos una categoría"),
 });
 
 type VentureForm = z.infer<typeof ventureSchema>;
@@ -89,13 +89,15 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      setError("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.");
+      setError(
+        "Tipo de archivo inválido. Solo se permiten JPEG, PNG, GIF y WebP."
+      );
       return;
     }
 
     // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size exceeds 10MB limit.");
+      setError("El archivo excede el límite de 10MB.");
       return;
     }
 
@@ -113,7 +115,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
       const response = await apiClient.uploadVentureImage(file);
       setImageUrl(response.url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload image");
+      setError(err instanceof Error ? err.message : "Error al subir la imagen");
       setImagePreview(null);
     } finally {
       setUploadingImage(false);
@@ -146,7 +148,9 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
       handleClose();
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create venture");
+      setError(
+        err instanceof Error ? err.message : "Error al crear el emprendimiento"
+      );
     } finally {
       setLoading(false);
     }
@@ -165,10 +169,10 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
       borderRadius: 2.5,
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0px 2px 8px rgba(0,0,0,0.06)",
+        boxShadow: "0px 2px 8px rgba(30,58,95,0.08)",
       },
       "&.Mui-focused": {
-        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+        boxShadow: "0px 4px 12px rgba(30,58,95,0.12)",
       },
     },
   };
@@ -182,7 +186,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
       PaperProps={{
         sx: {
           borderRadius: 4,
-          boxShadow: "0px 24px 48px rgba(0,0,0,0.2)",
+          boxShadow: "0px 24px 48px rgba(30,58,95,0.2)",
         },
       }}
     >
@@ -201,7 +205,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                 width: 48,
                 height: 48,
                 borderRadius: 2,
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -211,11 +215,14 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
               <Store />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Create New Venture
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700, color: "primary.main" }}
+              >
+                Crear Nuevo Emprendimiento
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Start selling your products
+                Comienza a vender tus productos
               </Typography>
             </Box>
           </Box>
@@ -239,7 +246,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
 
           <TextField
             {...register("name")}
-            label="Venture Name"
+            label="Nombre del Emprendimiento"
             fullWidth
             margin="normal"
             error={!!errors.name}
@@ -247,7 +254,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Store sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Store sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               ),
             }}
@@ -256,7 +263,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
 
           <TextField
             {...register("description")}
-            label="Description"
+            label="Descripción"
             fullWidth
             margin="normal"
             multiline
@@ -269,7 +276,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                   position="start"
                   sx={{ alignSelf: "flex-start", mt: 1.5 }}
                 >
-                  <Description sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Description sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               ),
             }}
@@ -278,8 +285,15 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
 
           {/* Image Upload Section */}
           <Box sx={{ mt: 2, mb: 2 }}>
-            <Typography sx={{ fontWeight: 600, mb: 1, fontSize: "0.9rem" }}>
-              Venture Image (Optional)
+            <Typography
+              sx={{
+                fontWeight: 600,
+                mb: 1,
+                fontSize: "0.9rem",
+                color: "primary.main",
+              }}
+            >
+              Imagen del Emprendimiento (Opcional)
             </Typography>
 
             {imagePreview ? (
@@ -307,7 +321,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      bgcolor: "rgba(0,0,0,0.5)",
+                      bgcolor: "rgba(30,58,95,0.7)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -317,7 +331,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                   >
                     <CircularProgress sx={{ color: "white" }} size={32} />
                     <Typography sx={{ color: "white", fontSize: "0.9rem" }}>
-                      Uploading...
+                      Subiendo...
                     </Typography>
                   </Box>
                 )}
@@ -331,7 +345,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                       bgcolor: "rgba(0,0,0,0.6)",
                       color: "white",
                       "&:hover": {
-                        bgcolor: "rgba(239,68,68,0.8)",
+                        bgcolor: "error.main",
                       },
                     }}
                   >
@@ -354,26 +368,26 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                 onClick={() => fileInputRef.current?.click()}
                 sx={{
                   border: "2px dashed",
-                  borderColor: "divider",
+                  borderColor: "primary.light",
                   borderRadius: 3,
                   p: 4,
                   textAlign: "center",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    borderColor: "black",
-                    bgcolor: "rgba(0,0,0,0.02)",
+                    borderColor: "primary.main",
+                    bgcolor: "rgba(30,58,95,0.03)",
                   },
                 }}
               >
                 <CloudUpload
-                  sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
+                  sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
                 />
-                <Typography sx={{ fontWeight: 600 }}>
-                  Click to upload image
+                <Typography sx={{ fontWeight: 600, color: "primary.main" }}>
+                  Haz clic para subir una imagen
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  JPEG, PNG, GIF, WebP (max 10MB)
+                  JPEG, PNG, GIF, WebP (máx. 10MB)
                 </Typography>
               </Box>
             )}
@@ -392,7 +406,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
             margin="normal"
             error={!!errors.categoryExternalIds}
           >
-            <InputLabel>Categories</InputLabel>
+            <InputLabel>Categorías</InputLabel>
             <Select
               multiple
               value={selectedCategories}
@@ -411,7 +425,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                         label={category?.name}
                         size="small"
                         sx={{
-                          bgcolor: "black",
+                          bgcolor: "primary.main",
                           color: "white",
                           fontWeight: 600,
                           fontSize: "0.75rem",
@@ -427,12 +441,12 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
                   transition: "all 0.3s ease",
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  boxShadow: "0px 2px 8px rgba(0,0,0,0.06)",
+                  boxShadow: "0px 2px 8px rgba(30,58,95,0.08)",
                 },
               }}
               startAdornment={
                 <InputAdornment position="start">
-                  <Category sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Category sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               }
             >
@@ -469,7 +483,7 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
               color: "text.secondary",
             }}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             type="submit"
@@ -479,15 +493,15 @@ export function CreateVentureDialog({ open, onClose, onSuccess }: Props) {
               px: 4,
               py: 1,
               fontWeight: 700,
-              bgcolor: "black",
+              bgcolor: "primary.main",
               borderRadius: 2,
-              boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+              boxShadow: "0px 4px 12px rgba(30,58,95,0.25)",
               "&:hover": {
-                bgcolor: "#1a1a1a",
+                bgcolor: "primary.dark",
               },
             }}
           >
-            {loading ? "Creating..." : "Create Venture"}
+            {loading ? "Creando..." : "Crear Emprendimiento"}
           </Button>
         </DialogActions>
       </form>

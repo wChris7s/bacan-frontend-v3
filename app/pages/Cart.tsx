@@ -104,9 +104,7 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
-    alert(
-      "Checkout functionality would be implemented here with payment gateway"
-    );
+    alert("Funcionalidad en desarrollo ...");
   };
 
   if (isLoading) {
@@ -117,12 +115,12 @@ export default function Cart() {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "calc(100vh - 70px)",
-          bgcolor: "#fafafa",
+          bgcolor: "background.default",
         }}
       >
         <Box sx={{ textAlign: "center" }}>
-          <CircularProgress sx={{ color: "black", mb: 2 }} size={48} />
-          <Typography color="text.secondary">Loading cart...</Typography>
+          <CircularProgress sx={{ color: "primary.main", mb: 2 }} size={48} />
+          <Typography color="text.secondary">Cargando carrito...</Typography>
         </Box>
       </Box>
     );
@@ -130,7 +128,9 @@ export default function Cart() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <Box sx={{ bgcolor: "#fafafa", minHeight: "calc(100vh - 70px)" }}>
+      <Box
+        sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 70px)" }}
+      >
         <Container maxWidth="md" sx={{ py: 12 }}>
           <Box
             sx={{
@@ -148,7 +148,7 @@ export default function Cart() {
                 width: 120,
                 height: 120,
                 borderRadius: "50%",
-                bgcolor: "rgba(0,0,0,0.03)",
+                bgcolor: "rgba(30,58,95,0.08)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -156,7 +156,7 @@ export default function Cart() {
                 mb: 4,
               }}
             >
-              <ShoppingBag sx={{ fontSize: 60, color: "text.secondary" }} />
+              <ShoppingBag sx={{ fontSize: 60, color: "primary.main" }} />
             </Box>
             <Typography
               variant="h3"
@@ -164,17 +164,18 @@ export default function Cart() {
               sx={{
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
+                color: "primary.main",
               }}
             >
-              Your cart is empty
+              Tu carrito está vacío
             </Typography>
             <Typography
               color="text.secondary"
               paragraph
               sx={{ fontSize: "1.15rem", mb: 5, maxWidth: 400, mx: "auto" }}
             >
-              Looks like you haven't added anything to your cart yet. Start
-              browsing to find great products!
+              Parece que aún no has agregado nada a tu carrito. ¡Comienza a
+              explorar productos increíbles!
             </Typography>
             <Button
               variant="contained"
@@ -186,18 +187,18 @@ export default function Cart() {
                 py: 1.8,
                 fontSize: "1rem",
                 fontWeight: 700,
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 borderRadius: 3,
-                boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
+                boxShadow: "0px 8px 24px rgba(30,58,95,0.3)",
                 transition: "all 0.3s ease",
                 "&:hover": {
-                  bgcolor: "#1a1a1a",
+                  bgcolor: "primary.dark",
                   transform: "translateY(-2px)",
-                  boxShadow: "0px 12px 32px rgba(0,0,0,0.25)",
+                  boxShadow: "0px 12px 32px rgba(30,58,95,0.4)",
                 },
               }}
             >
-              Browse Products
+              Explorar Productos
             </Button>
           </Box>
         </Container>
@@ -206,11 +207,14 @@ export default function Cart() {
   }
 
   return (
-    <Box sx={{ bgcolor: "#fafafa", minHeight: "calc(100vh - 70px)" }}>
+    <Box
+      sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 70px)" }}
+    >
       {/* Header */}
       <Box
         sx={{
-          bgcolor: "black",
+          background:
+            "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 40%, #3d7ab7 100%)",
           color: "white",
           py: { xs: 5, md: 6 },
           position: "relative",
@@ -222,8 +226,8 @@ export default function Cart() {
             position: "absolute",
             inset: 0,
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+              linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
             `,
             backgroundSize: "50px 50px",
           }}
@@ -238,7 +242,7 @@ export default function Cart() {
               animation: `${fadeInUp} 0.6s ease-out`,
             }}
           >
-            Shopping Cart
+            Carrito de Compras
           </Typography>
           <Typography
             sx={{
@@ -248,8 +252,8 @@ export default function Cart() {
               animation: `${fadeInUp} 0.6s ease-out 0.1s both`,
             }}
           >
-            {cart.totalItems} item{cart.totalItems !== 1 ? "s" : ""} in your
-            cart
+            {cart.totalItems} artículo{cart.totalItems !== 1 ? "s" : ""} en tu
+            carrito
           </Typography>
         </Container>
       </Box>
@@ -300,6 +304,7 @@ export default function Cart() {
                             fontWeight: 700,
                             mb: 0.5,
                             letterSpacing: "-0.01em",
+                            color: "primary.main",
                           }}
                         >
                           {item.product.name}
@@ -318,7 +323,7 @@ export default function Cart() {
                         </Typography>
                         <Typography
                           variant="h6"
-                          sx={{ fontWeight: 800, color: "black" }}
+                          sx={{ fontWeight: 800, color: "secondary.main" }}
                         >
                           ${item.product.price.toFixed(2)}
                         </Typography>
@@ -330,7 +335,7 @@ export default function Cart() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            bgcolor: "rgba(0,0,0,0.03)",
+                            bgcolor: "rgba(30,58,95,0.05)",
                             borderRadius: 3,
                             p: 0.5,
                           }}
@@ -400,7 +405,7 @@ export default function Cart() {
                           sx={{ mt: 1.5, fontWeight: 600 }}
                         >
                           Subtotal:{" "}
-                          <Box component="span" sx={{ color: "black" }}>
+                          <Box component="span" sx={{ color: "primary.main" }}>
                             ${item.subtotal.toFixed(2)}
                           </Box>
                         </Typography>
@@ -450,7 +455,7 @@ export default function Cart() {
                 },
               }}
             >
-              Clear Cart
+              Vaciar Carrito
             </Button>
           </Grid>
 
@@ -469,13 +474,14 @@ export default function Cart() {
             >
               <Box
                 sx={{
-                  bgcolor: "black",
+                  background:
+                    "linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)",
                   color: "white",
                   p: 3,
                 }}
               >
                 <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  Order Summary
+                  Resumen del Pedido
                 </Typography>
               </Box>
 
@@ -490,7 +496,7 @@ export default function Cart() {
                   <Typography
                     sx={{ fontSize: "1rem", color: "text.secondary" }}
                   >
-                    Subtotal ({cart.totalItems} items)
+                    Subtotal ({cart.totalItems} artículos)
                   </Typography>
                   <Typography sx={{ fontWeight: 600 }}>
                     ${cart.total.toFixed(2)}
@@ -507,10 +513,10 @@ export default function Cart() {
                   <Typography
                     sx={{ fontSize: "1rem", color: "text.secondary" }}
                   >
-                    Shipping
+                    Envío
                   </Typography>
                   <Typography sx={{ fontWeight: 600, color: "success.main" }}>
-                    Free
+                    Gratis
                   </Typography>
                 </Box>
 
@@ -530,7 +536,7 @@ export default function Cart() {
                     variant="h5"
                     sx={{
                       fontWeight: 800,
-                      color: "black",
+                      color: "secondary.main",
                       letterSpacing: "-0.02em",
                     }}
                   >
@@ -547,18 +553,18 @@ export default function Cart() {
                     py: 1.8,
                     fontSize: "1.05rem",
                     fontWeight: 700,
-                    bgcolor: "black",
+                    bgcolor: "secondary.main",
                     borderRadius: 3,
-                    boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
+                    boxShadow: "0px 8px 24px rgba(255,152,0,0.4)",
                     transition: "all 0.3s ease",
                     "&:hover": {
-                      bgcolor: "#1a1a1a",
+                      bgcolor: "secondary.dark",
                       transform: "translateY(-2px)",
-                      boxShadow: "0px 12px 32px rgba(0,0,0,0.25)",
+                      boxShadow: "0px 12px 32px rgba(255,152,0,0.5)",
                     },
                   }}
                 >
-                  Proceed to Checkout
+                  Proceder al Pago
                 </Button>
 
                 {/* Trust badges */}
@@ -574,15 +580,15 @@ export default function Cart() {
                     sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                   >
                     {[
-                      { icon: <Security />, text: "Secure checkout" },
-                      { icon: <LocalShipping />, text: "Free shipping" },
-                      { icon: <CreditCard />, text: "Safe payment" },
+                      { icon: <Security />, text: "Pago seguro" },
+                      { icon: <LocalShipping />, text: "Envío gratis" },
+                      { icon: <CreditCard />, text: "Pago protegido" },
                     ].map((item, index) => (
                       <Box
                         key={index}
                         sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
                       >
-                        <Box sx={{ color: "text.secondary" }}>{item.icon}</Box>
+                        <Box sx={{ color: "primary.main" }}>{item.icon}</Box>
                         <Typography
                           variant="body2"
                           color="text.secondary"

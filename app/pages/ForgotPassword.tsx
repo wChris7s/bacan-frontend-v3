@@ -25,27 +25,29 @@ import {
 import { apiClient } from "~/lib/api/client";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Correo electrónico inválido"),
 });
 
 const confirmPasswordSchema = z
   .object({
-    email: z.string().email("Invalid email address"),
-    confirmationCode: z.string().min(1, "Confirmation code is required"),
+    email: z.string().email("Correo electrónico inválido"),
+    confirmationCode: z
+      .string()
+      .min(1, "El código de confirmación es requerido"),
     newPassword: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
+      .regex(/[A-Z]/, "La contraseña debe contener al menos una mayúscula")
+      .regex(/[a-z]/, "La contraseña debe contener al menos una minúscula")
+      .regex(/[0-9]/, "La contraseña debe contener al menos un número")
       .regex(
         /[^A-Za-z0-9]/,
-        "Password must contain at least one special character"
+        "La contraseña debe contener al menos un carácter especial"
       ),
     confirmNewPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "Passwords don't match",
+    message: "Las contraseñas no coinciden",
     path: ["confirmNewPassword"],
   });
 
@@ -83,10 +85,14 @@ export default function ForgotPassword() {
       setEmail(data.email);
       confirmForm.setValue("email", data.email);
       setStep("confirm");
-      setSuccess("A verification code has been sent to your email.");
+      setSuccess(
+        "Se ha enviado un código de verificación a tu correo electrónico."
+      );
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to send reset code"
+        err instanceof Error
+          ? err.message
+          : "Error al enviar el código de recuperación"
       );
     } finally {
       setLoading(false);
@@ -104,13 +110,19 @@ export default function ForgotPassword() {
         newPassword: data.newPassword,
       });
 
-      setSuccess("Password reset successfully! Redirecting to login...");
+      setSuccess(
+        "¡Contraseña restablecida exitosamente! Redirigiendo al inicio de sesión..."
+      );
 
       setTimeout(() => {
-        navigate("/ingresar");
+        navigate("/login");
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reset password");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Error al restablecer la contraseña"
+      );
     } finally {
       setLoading(false);
     }
@@ -121,10 +133,10 @@ export default function ForgotPassword() {
       borderRadius: 3,
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+        boxShadow: "0px 4px 12px rgba(30,58,95,0.1)",
       },
       "&.Mui-focused": {
-        boxShadow: "0px 4px 16px rgba(0,0,0,0.12)",
+        boxShadow: "0px 4px 16px rgba(30,58,95,0.15)",
       },
     },
   };
@@ -135,7 +147,7 @@ export default function ForgotPassword() {
         minHeight: "calc(100vh - 70px)",
         display: "flex",
         alignItems: "center",
-        background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
       }}
     >
       <Container maxWidth="sm" sx={{ py: 6 }}>
@@ -143,41 +155,46 @@ export default function ForgotPassword() {
           sx={{
             bgcolor: "white",
             borderRadius: 5,
-            boxShadow: "0px 24px 80px rgba(0, 0, 0, 0.1)",
-            border: "1px solid rgba(0,0,0,0.05)",
+            boxShadow: "0px 24px 80px rgba(30, 58, 95, 0.12)",
+            border: "1px solid rgba(30,58,95,0.08)",
             p: { xs: 4, sm: 6 },
           }}
         >
           <Button
             component={Link}
-            to="/ingresar"
+            to="/login"
             startIcon={<ArrowBack />}
             sx={{
               mb: 3,
               color: "text.secondary",
               "&:hover": {
                 bgcolor: "transparent",
-                color: "black",
+                color: "primary.main",
               },
             }}
           >
-            Back to Login
+            Volver al Inicio de Sesión
           </Button>
 
           {step === "email" ? (
             <>
               <Typography
                 variant="h4"
-                sx={{ fontWeight: 800, mb: 1, letterSpacing: "-0.02em" }}
+                sx={{
+                  fontWeight: 800,
+                  mb: 1,
+                  letterSpacing: "-0.02em",
+                  color: "primary.main",
+                }}
               >
-                Forgot Password?
+                ¿Olvidaste tu Contraseña?
               </Typography>
               <Typography
                 color="text.secondary"
                 sx={{ mb: 4, fontSize: "1rem" }}
               >
-                Enter your email and we'll send you a verification code to reset
-                your password.
+                Ingresa tu correo electrónico y te enviaremos un código de
+                verificación para restablecer tu contraseña.
               </Typography>
 
               {error && (
@@ -201,7 +218,7 @@ export default function ForgotPassword() {
               >
                 <TextField
                   {...forgotForm.register("email")}
-                  label="Email Address"
+                  label="Correo Electrónico"
                   type="email"
                   fullWidth
                   error={!!forgotForm.formState.errors.email}
@@ -209,7 +226,7 @@ export default function ForgotPassword() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Email sx={{ color: "text.secondary", fontSize: 20 }} />
+                        <Email sx={{ color: "primary.main", fontSize: 20 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -228,18 +245,18 @@ export default function ForgotPassword() {
                     py: 1.8,
                     fontSize: "1.05rem",
                     fontWeight: 700,
-                    bgcolor: "black",
+                    bgcolor: "primary.main",
                     borderRadius: 3,
-                    boxShadow: "0px 8px 24px rgba(0,0,0,0.25)",
+                    boxShadow: "0px 8px 24px rgba(30,58,95,0.3)",
                     transition: "all 0.3s ease",
                     "&:hover": {
-                      bgcolor: "#1a1a1a",
+                      bgcolor: "primary.dark",
                       transform: "translateY(-2px)",
-                      boxShadow: "0px 12px 32px rgba(0,0,0,0.3)",
+                      boxShadow: "0px 12px 32px rgba(30,58,95,0.4)",
                     },
                   }}
                 >
-                  {loading ? "Sending..." : "Send Reset Code"}
+                  {loading ? "Enviando..." : "Enviar Código de Recuperación"}
                 </Button>
               </Box>
             </>
@@ -247,16 +264,21 @@ export default function ForgotPassword() {
             <>
               <Typography
                 variant="h4"
-                sx={{ fontWeight: 800, mb: 1, letterSpacing: "-0.02em" }}
+                sx={{
+                  fontWeight: 800,
+                  mb: 1,
+                  letterSpacing: "-0.02em",
+                  color: "primary.main",
+                }}
               >
-                Reset Password
+                Restablecer Contraseña
               </Typography>
               <Typography
                 color="text.secondary"
                 sx={{ mb: 4, fontSize: "1rem" }}
               >
-                Enter the verification code sent to <strong>{email}</strong> and
-                your new password.
+                Ingresa el código de verificación enviado a{" "}
+                <strong>{email}</strong> y tu nueva contraseña.
               </Typography>
 
               {error && (
@@ -294,7 +316,7 @@ export default function ForgotPassword() {
               >
                 <TextField
                   {...confirmForm.register("confirmationCode")}
-                  label="Verification Code"
+                  label="Código de Verificación"
                   fullWidth
                   margin="normal"
                   error={!!confirmForm.formState.errors.confirmationCode}
@@ -304,9 +326,7 @@ export default function ForgotPassword() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Numbers
-                          sx={{ color: "text.secondary", fontSize: 20 }}
-                        />
+                        <Numbers sx={{ color: "primary.main", fontSize: 20 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -315,19 +335,19 @@ export default function ForgotPassword() {
 
                 <TextField
                   {...confirmForm.register("newPassword")}
-                  label="New Password"
+                  label="Nueva Contraseña"
                   type={showPassword ? "text" : "password"}
                   fullWidth
                   margin="normal"
                   error={!!confirmForm.formState.errors.newPassword}
                   helperText={
                     confirmForm.formState.errors.newPassword?.message ||
-                    "Min 8 chars, uppercase, lowercase, number, special char"
+                    "Mín. 8 caracteres, mayúscula, minúscula, número, carácter especial"
                   }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock sx={{ color: "text.secondary", fontSize: 20 }} />
+                        <Lock sx={{ color: "primary.main", fontSize: 20 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -346,7 +366,7 @@ export default function ForgotPassword() {
 
                 <TextField
                   {...confirmForm.register("confirmNewPassword")}
-                  label="Confirm New Password"
+                  label="Confirmar Nueva Contraseña"
                   type={showConfirmPassword ? "text" : "password"}
                   fullWidth
                   margin="normal"
@@ -357,7 +377,7 @@ export default function ForgotPassword() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock sx={{ color: "text.secondary", fontSize: 20 }} />
+                        <Lock sx={{ color: "primary.main", fontSize: 20 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -392,18 +412,18 @@ export default function ForgotPassword() {
                     py: 1.8,
                     fontSize: "1.05rem",
                     fontWeight: 700,
-                    bgcolor: "black",
+                    bgcolor: "primary.main",
                     borderRadius: 3,
-                    boxShadow: "0px 8px 24px rgba(0,0,0,0.25)",
+                    boxShadow: "0px 8px 24px rgba(30,58,95,0.3)",
                     transition: "all 0.3s ease",
                     "&:hover": {
-                      bgcolor: "#1a1a1a",
+                      bgcolor: "primary.dark",
                       transform: "translateY(-2px)",
-                      boxShadow: "0px 12px 32px rgba(0,0,0,0.3)",
+                      boxShadow: "0px 12px 32px rgba(30,58,95,0.4)",
                     },
                   }}
                 >
-                  {loading ? "Resetting..." : "Reset Password"}
+                  {loading ? "Restableciendo..." : "Restablecer Contraseña"}
                 </Button>
 
                 <Button
@@ -418,11 +438,11 @@ export default function ForgotPassword() {
                     width: "100%",
                     "&:hover": {
                       bgcolor: "transparent",
-                      color: "black",
+                      color: "primary.main",
                     },
                   }}
                 >
-                  Use a different email
+                  Usar un correo diferente
                 </Button>
               </Box>
             </>

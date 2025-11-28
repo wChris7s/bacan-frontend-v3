@@ -108,9 +108,9 @@ export default function Register() {
 
       // Redirigir según el rol
       if (loginResponse.role === UserRole.ENTREPRENEUR) {
-        navigate("/panel");
+        navigate("/dashboard");
       } else {
-        navigate("/productos");
+        navigate("/products");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error en el registro");
@@ -124,10 +124,10 @@ export default function Register() {
       borderRadius: 3,
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0px 4px 12px rgba(5, 150, 105, 0.1)",
+        boxShadow: "0px 4px 12px rgba(30,58,95,0.1)",
       },
       "&.Mui-focused": {
-        boxShadow: "0px 4px 16px rgba(5, 150, 105, 0.15)",
+        boxShadow: "0px 4px 16px rgba(30,58,95,0.15)",
       },
     },
   };
@@ -140,7 +140,7 @@ export default function Register() {
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)",
+        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
         py: 4,
         "&::before": {
           content: '""',
@@ -150,7 +150,7 @@ export default function Register() {
           width: "60%",
           height: "120%",
           background:
-            "radial-gradient(ellipse, rgba(5,150,105,0.08) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(30,58,95,0.08) 0%, transparent 70%)",
           transform: "rotate(15deg)",
         },
       }}
@@ -160,8 +160,8 @@ export default function Register() {
           sx={{
             bgcolor: "white",
             borderRadius: 5,
-            boxShadow: "0px 24px 80px rgba(5, 150, 105, 0.12)",
-            border: "1px solid rgba(5, 150, 105, 0.1)",
+            boxShadow: "0px 24px 80px rgba(30, 58, 95, 0.12)",
+            border: "1px solid rgba(30,58,95,0.08)",
             overflow: "hidden",
           }}
         >
@@ -176,7 +176,7 @@ export default function Register() {
               <Box
                 sx={{
                   background:
-                    "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                    "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 100%)",
                   color: "white",
                   p: 5,
                   display: "flex",
@@ -210,7 +210,7 @@ export default function Register() {
                     height: 200,
                     borderRadius: "50%",
                     background:
-                      "radial-gradient(circle, rgba(245,158,11,0.3) 0%, transparent 70%)",
+                      "radial-gradient(circle, rgba(255,152,0,0.3) 0%, transparent 70%)",
                   }}
                 />
 
@@ -225,10 +225,10 @@ export default function Register() {
                       alignItems: "center",
                       justifyContent: "center",
                       mb: 4,
-                      boxShadow: "0px 8px 24px rgba(245,158,11,0.3)",
+                      boxShadow: "0px 8px 24px rgba(255,152,0,0.3)",
                     }}
                   >
-                    <Rocket sx={{ fontSize: 32, color: "black" }} />
+                    <Rocket sx={{ fontSize: 32, color: "white" }} />
                   </Box>
 
                   <Typography
@@ -239,7 +239,7 @@ export default function Register() {
                       letterSpacing: "-0.02em",
                     }}
                   >
-                    Únete a Bacán
+                    Únete a BACAN
                   </Typography>
                   <Typography
                     sx={{
@@ -275,7 +275,7 @@ export default function Register() {
                             alignItems: "center",
                             justifyContent: "center",
                             fontSize: "0.7rem",
-                            color: "black",
+                            color: "white",
                             fontWeight: 700,
                           }}
                         >
@@ -301,6 +301,7 @@ export default function Register() {
                       fontWeight: 800,
                       mb: 1,
                       letterSpacing: "-0.02em",
+                      color: "primary.main",
                     }}
                   >
                     Crear Cuenta
@@ -334,7 +335,7 @@ export default function Register() {
                     <Typography
                       sx={{
                         fontWeight: 600,
-                        color: "text.primary",
+                        color: "primary.main",
                         mb: 1.5,
                         fontSize: "0.9rem",
                       }}
@@ -367,7 +368,7 @@ export default function Register() {
                           transition: "all 0.3s ease",
                           bgcolor:
                             selectedRole === "CUSTOMER"
-                              ? "rgba(5, 150, 105, 0.05)"
+                              ? "rgba(30, 58, 95, 0.05)"
                               : "transparent",
                           "&:hover": {
                             borderColor:
@@ -437,7 +438,7 @@ export default function Register() {
                           transition: "all 0.3s ease",
                           bgcolor:
                             selectedRole === "ENTREPRENEUR"
-                              ? "rgba(5, 150, 105, 0.05)"
+                              ? "rgba(30, 58, 95, 0.05)"
                               : "transparent",
                           "&:hover": {
                             borderColor:
@@ -654,12 +655,12 @@ export default function Register() {
                       fontWeight: 700,
                       bgcolor: "primary.main",
                       borderRadius: 3,
-                      boxShadow: "0px 8px 24px rgba(5, 150, 105, 0.3)",
+                      boxShadow: "0px 8px 24px rgba(30, 58, 95, 0.35)",
                       transition: "all 0.3s ease",
                       "&:hover": {
                         bgcolor: "primary.dark",
                         transform: "translateY(-2px)",
-                        boxShadow: "0px 12px 32px rgba(5, 150, 105, 0.4)",
+                        boxShadow: "0px 12px 32px rgba(30, 58, 95, 0.45)",
                       },
                       "&:active": {
                         transform: "translateY(0)",
@@ -677,7 +678,7 @@ export default function Register() {
                       ¿Ya tienes una cuenta?{" "}
                       <Box
                         component={Link}
-                        to="/ingresar"
+                        to="/login"
                         sx={{
                           color: "primary.main",
                           fontWeight: 600,

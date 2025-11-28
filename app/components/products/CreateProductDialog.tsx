@@ -39,14 +39,14 @@ import { apiClient } from "~/lib/api/client";
 import { Venture } from "~/lib/api/types";
 
 const productSchema = z.object({
-  ventureExternalId: z.string().min(1, "Select a venture"),
-  name: z.string().min(3, "Name must be at least 3 characters"),
+  ventureExternalId: z.string().min(1, "Selecciona un emprendimiento"),
+  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
   description: z.string().optional(),
-  price: z.number().min(0.01, "Price must be greater than 0"),
-  stock: z.number().int().min(0, "Stock must be 0 or greater"),
+  price: z.number().min(0.01, "El precio debe ser mayor a 0"),
+  stock: z.number().int().min(0, "El stock debe ser 0 o mayor"),
   categoryExternalIds: z
     .array(z.string())
-    .min(1, "Select at least one category"),
+    .min(1, "Selecciona al menos una categoría"),
 });
 
 type ProductForm = z.infer<typeof productSchema>;
@@ -102,13 +102,15 @@ export function CreateProductDialog({
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      setError("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.");
+      setError(
+        "Tipo de archivo inválido. Solo se permiten JPEG, PNG, GIF y WebP."
+      );
       return;
     }
 
     // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size exceeds 10MB limit.");
+      setError("El archivo excede el límite de 10MB.");
       return;
     }
 
@@ -126,7 +128,7 @@ export function CreateProductDialog({
       const response = await apiClient.uploadProductImage(file);
       setImageUrl(response.url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload image");
+      setError(err instanceof Error ? err.message : "Error al subir la imagen");
       setImagePreview(null);
     } finally {
       setUploadingImage(false);
@@ -159,7 +161,9 @@ export function CreateProductDialog({
       handleClose();
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create product");
+      setError(
+        err instanceof Error ? err.message : "Error al crear el producto"
+      );
     } finally {
       setLoading(false);
     }
@@ -178,10 +182,10 @@ export function CreateProductDialog({
       borderRadius: 2.5,
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0px 2px 8px rgba(0,0,0,0.06)",
+        boxShadow: "0px 2px 8px rgba(30,58,95,0.08)",
       },
       "&.Mui-focused": {
-        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+        boxShadow: "0px 4px 12px rgba(30,58,95,0.12)",
       },
     },
   };
@@ -195,7 +199,7 @@ export function CreateProductDialog({
       PaperProps={{
         sx: {
           borderRadius: 4,
-          boxShadow: "0px 24px 48px rgba(0,0,0,0.2)",
+          boxShadow: "0px 24px 48px rgba(30,58,95,0.2)",
         },
       }}
     >
@@ -214,7 +218,7 @@ export function CreateProductDialog({
                 width: 48,
                 height: 48,
                 borderRadius: 2,
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -224,11 +228,14 @@ export function CreateProductDialog({
               <Inventory />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Create New Product
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700, color: "primary.main" }}
+              >
+                Crear Nuevo Producto
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Add a product to your venture
+                Agrega un producto a tu emprendimiento
               </Typography>
             </Box>
           </Box>
@@ -255,16 +262,16 @@ export function CreateProductDialog({
             margin="normal"
             error={!!errors.ventureExternalId}
           >
-            <InputLabel>Venture</InputLabel>
+            <InputLabel>Emprendimiento</InputLabel>
             <Select
               {...register("ventureExternalId")}
-              label="Venture"
+              label="Emprendimiento"
               sx={{
                 borderRadius: 2.5,
               }}
               startAdornment={
                 <InputAdornment position="start">
-                  <Store sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Store sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               }
             >
@@ -290,7 +297,7 @@ export function CreateProductDialog({
 
           <TextField
             {...register("name")}
-            label="Product Name"
+            label="Nombre del Producto"
             fullWidth
             margin="normal"
             error={!!errors.name}
@@ -298,7 +305,7 @@ export function CreateProductDialog({
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Inventory sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Inventory sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               ),
             }}
@@ -307,7 +314,7 @@ export function CreateProductDialog({
 
           <TextField
             {...register("description")}
-            label="Description"
+            label="Descripción"
             fullWidth
             margin="normal"
             multiline
@@ -318,7 +325,7 @@ export function CreateProductDialog({
                   position="start"
                   sx={{ alignSelf: "flex-start", mt: 1.5 }}
                 >
-                  <Description sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Description sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               ),
             }}
@@ -329,7 +336,7 @@ export function CreateProductDialog({
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 {...register("price", { valueAsNumber: true })}
-                label="Price"
+                label="Precio"
                 type="number"
                 fullWidth
                 error={!!errors.price}
@@ -339,7 +346,7 @@ export function CreateProductDialog({
                   startAdornment: (
                     <InputAdornment position="start">
                       <AttachMoney
-                        sx={{ color: "text.secondary", fontSize: 20 }}
+                        sx={{ color: "secondary.main", fontSize: 20 }}
                       />
                     </InputAdornment>
                   ),
@@ -359,7 +366,7 @@ export function CreateProductDialog({
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Numbers sx={{ color: "text.secondary", fontSize: 20 }} />
+                      <Numbers sx={{ color: "primary.main", fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -370,8 +377,15 @@ export function CreateProductDialog({
 
           {/* Image Upload Section */}
           <Box sx={{ mt: 3, mb: 2 }}>
-            <Typography sx={{ fontWeight: 600, mb: 1, fontSize: "0.9rem" }}>
-              Product Image (Optional)
+            <Typography
+              sx={{
+                fontWeight: 600,
+                mb: 1,
+                fontSize: "0.9rem",
+                color: "primary.main",
+              }}
+            >
+              Imagen del Producto (Opcional)
             </Typography>
 
             {imagePreview ? (
@@ -399,7 +413,7 @@ export function CreateProductDialog({
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      bgcolor: "rgba(0,0,0,0.5)",
+                      bgcolor: "rgba(30,58,95,0.7)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -409,7 +423,7 @@ export function CreateProductDialog({
                   >
                     <CircularProgress sx={{ color: "white" }} size={32} />
                     <Typography sx={{ color: "white", fontSize: "0.9rem" }}>
-                      Uploading...
+                      Subiendo...
                     </Typography>
                   </Box>
                 )}
@@ -423,7 +437,7 @@ export function CreateProductDialog({
                       bgcolor: "rgba(0,0,0,0.6)",
                       color: "white",
                       "&:hover": {
-                        bgcolor: "rgba(239,68,68,0.8)",
+                        bgcolor: "error.main",
                       },
                     }}
                   >
@@ -446,26 +460,26 @@ export function CreateProductDialog({
                 onClick={() => fileInputRef.current?.click()}
                 sx={{
                   border: "2px dashed",
-                  borderColor: "divider",
+                  borderColor: "primary.light",
                   borderRadius: 3,
                   p: 4,
                   textAlign: "center",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    borderColor: "black",
-                    bgcolor: "rgba(0,0,0,0.02)",
+                    borderColor: "primary.main",
+                    bgcolor: "rgba(30,58,95,0.03)",
                   },
                 }}
               >
                 <CloudUpload
-                  sx={{ fontSize: 48, color: "text.secondary", mb: 1 }}
+                  sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
                 />
-                <Typography sx={{ fontWeight: 600 }}>
-                  Click to upload image
+                <Typography sx={{ fontWeight: 600, color: "primary.main" }}>
+                  Haz clic para subir una imagen
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  JPEG, PNG, GIF, WebP (max 10MB)
+                  JPEG, PNG, GIF, WebP (máx. 10MB)
                 </Typography>
               </Box>
             )}
@@ -484,7 +498,7 @@ export function CreateProductDialog({
             margin="normal"
             error={!!errors.categoryExternalIds}
           >
-            <InputLabel>Categories</InputLabel>
+            <InputLabel>Categorías</InputLabel>
             <Select
               multiple
               value={selectedCategories}
@@ -503,7 +517,7 @@ export function CreateProductDialog({
                         label={category?.name}
                         size="small"
                         sx={{
-                          bgcolor: "black",
+                          bgcolor: "primary.main",
                           color: "white",
                           fontWeight: 600,
                           fontSize: "0.75rem",
@@ -518,7 +532,7 @@ export function CreateProductDialog({
               }}
               startAdornment={
                 <InputAdornment position="start">
-                  <Category sx={{ color: "text.secondary", fontSize: 20 }} />
+                  <Category sx={{ color: "primary.main", fontSize: 20 }} />
                 </InputAdornment>
               }
             >
@@ -555,7 +569,7 @@ export function CreateProductDialog({
               color: "text.secondary",
             }}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             type="submit"
@@ -565,15 +579,15 @@ export function CreateProductDialog({
               px: 4,
               py: 1,
               fontWeight: 700,
-              bgcolor: "black",
+              bgcolor: "primary.main",
               borderRadius: 2,
-              boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+              boxShadow: "0px 4px 12px rgba(30,58,95,0.25)",
               "&:hover": {
-                bgcolor: "#1a1a1a",
+                bgcolor: "primary.dark",
               },
             }}
           >
-            {loading ? "Creating..." : "Create Product"}
+            {loading ? "Creando..." : "Crear Producto"}
           </Button>
         </DialogActions>
       </form>
