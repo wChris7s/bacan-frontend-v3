@@ -31,15 +31,15 @@ export const tokenManager = {
     accessToken = access;
     refreshToken = refresh;
     if (typeof window !== "undefined") {
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
+      localStorage.setItem("bacan_accessToken", access);
+      localStorage.setItem("bacan_refreshToken", refresh);
     }
   },
 
   getAccessToken(): string | null {
     if (accessToken) return accessToken;
     if (typeof window !== "undefined") {
-      accessToken = localStorage.getItem("accessToken");
+      accessToken = localStorage.getItem("bacan_accessToken");
     }
     return accessToken;
   },
@@ -47,7 +47,7 @@ export const tokenManager = {
   getRefreshToken(): string | null {
     if (refreshToken) return refreshToken;
     if (typeof window !== "undefined") {
-      refreshToken = localStorage.getItem("refreshToken");
+      refreshToken = localStorage.getItem("bacan_refreshToken");
     }
     return refreshToken;
   },
@@ -56,8 +56,8 @@ export const tokenManager = {
     accessToken = null;
     refreshToken = null;
     if (typeof window !== "undefined") {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("bacan_accessToken");
+      localStorage.removeItem("bacan_refreshToken");
     }
   },
 
@@ -100,7 +100,7 @@ async function fetchWithAuth(
       }
     } catch {
       tokenManager.clearTokens();
-      throw new Error("Session expired. Please login again.");
+      throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
     }
   }
 
@@ -114,7 +114,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
       timestamp: new Date().toISOString(),
       status: response.status,
       error: response.statusText,
-      message: "An error occurred",
+      message: "Ocurrió un error",
     }));
     throw new Error(errorData.message || `Error: ${response.status}`);
   }

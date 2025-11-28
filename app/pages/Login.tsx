@@ -27,8 +27,8 @@ import { apiClient } from "~/lib/api/client";
 import { UserRole } from "~/lib/api/types";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("Correo electrónico inválido"),
+  password: z.string().min(1, "La contraseña es requerida"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -64,14 +64,14 @@ export default function Login() {
 
       loginWithResponse(response);
 
-      // Redirect based on role
+      // Redirigir según el rol
       if (response.role === UserRole.ENTREPRENEUR) {
         navigate("/dashboard");
       } else {
         navigate("/products");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -98,28 +98,7 @@ export default function Login() {
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: "-30%",
-          left: "-10%",
-          width: "60%",
-          height: "120%",
-          background:
-            "radial-gradient(ellipse, rgba(0,0,0,0.03) 0%, transparent 70%)",
-          transform: "rotate(15deg)",
-        },
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          bottom: "-30%",
-          right: "-10%",
-          width: "50%",
-          height: "100%",
-          background:
-            "radial-gradient(ellipse, rgba(0,0,0,0.02) 0%, transparent 70%)",
-        },
+        background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
       }}
     >
       <Container maxWidth="md" sx={{ py: 6, position: "relative", zIndex: 1 }}>
@@ -133,7 +112,7 @@ export default function Login() {
           }}
         >
           <Grid container>
-            {/* Left side - decorative */}
+            {/* Lado izquierdo - decorativo */}
             <Grid
               size={{ xs: 12, md: 5 }}
               sx={{
@@ -142,7 +121,8 @@ export default function Login() {
             >
               <Box
                 sx={{
-                  bgcolor: "black",
+                  background:
+                    "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 100%)",
                   color: "white",
                   p: 5,
                   display: "flex",
@@ -165,18 +145,6 @@ export default function Login() {
                       linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
                     `,
                     backgroundSize: "40px 40px",
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "20%",
-                    right: "-20%",
-                    width: 200,
-                    height: 200,
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
                   }}
                 />
 
@@ -204,27 +172,27 @@ export default function Login() {
                       letterSpacing: "-0.02em",
                     }}
                   >
-                    Welcome Back
+                    ¡Bienvenido de Nuevo!
                   </Typography>
                   <Typography
                     sx={{
-                      opacity: 0.7,
+                      opacity: 0.8,
                       fontSize: "1.05rem",
                       lineHeight: 1.7,
                       mb: 4,
                     }}
                   >
-                    Sign in to continue managing your ventures or shopping for
-                    amazing products.
+                    Inicia sesión para administrar tu emprendimiento o explorar
+                    productos increíbles.
                   </Typography>
 
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                   >
                     {[
-                      "Secure authentication",
-                      "Easy access to your account",
-                      "Manage your ventures & orders",
+                      "Autenticación segura",
+                      "Acceso rápido a tu cuenta",
+                      "Gestiona tu negocio fácilmente",
                     ].map((text, index) => (
                       <Box
                         key={index}
@@ -235,7 +203,7 @@ export default function Login() {
                             width: 20,
                             height: 20,
                             borderRadius: "50%",
-                            bgcolor: "rgba(255,255,255,0.2)",
+                            bgcolor: "rgba(255,152,0,0.5)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -254,7 +222,7 @@ export default function Login() {
               </Box>
             </Grid>
 
-            {/* Right side - form */}
+            {/* Lado derecho - formulario */}
             <Grid size={{ xs: 12, md: 7 }}>
               <Box sx={{ p: { xs: 4, sm: 6 } }}>
                 <Box sx={{ mb: 4 }}>
@@ -264,12 +232,13 @@ export default function Login() {
                       fontWeight: 800,
                       mb: 1,
                       letterSpacing: "-0.02em",
+                      color: "primary.main",
                     }}
                   >
-                    Sign In
+                    Iniciar Sesión
                   </Typography>
                   <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
-                    Enter your credentials to access your account
+                    Ingresa tus credenciales para acceder a tu cuenta
                   </Typography>
                 </Box>
 
@@ -298,7 +267,7 @@ export default function Login() {
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Email Address"
+                        label="Correo Electrónico"
                         type="email"
                         fullWidth
                         margin="normal"
@@ -324,7 +293,7 @@ export default function Login() {
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        label="Password"
+                        label="Contraseña"
                         type={showPassword ? "text" : "password"}
                         fullWidth
                         margin="normal"
@@ -368,11 +337,11 @@ export default function Login() {
                         textDecoration: "none",
                         transition: "color 0.2s ease",
                         "&:hover": {
-                          color: "black",
+                          color: "primary.main",
                         },
                       }}
                     >
-                      Forgot password?
+                      ¿Olvidaste tu contraseña?
                     </Typography>
                   </Box>
 
@@ -388,21 +357,18 @@ export default function Login() {
                       py: 1.8,
                       fontSize: "1.05rem",
                       fontWeight: 700,
-                      bgcolor: "black",
+                      bgcolor: "primary.main",
                       borderRadius: 3,
-                      boxShadow: "0px 8px 24px rgba(0,0,0,0.25)",
+                      boxShadow: "0px 8px 24px rgba(30,58,95,0.35)",
                       transition: "all 0.3s ease",
                       "&:hover": {
-                        bgcolor: "#1a1a1a",
+                        bgcolor: "primary.dark",
                         transform: "translateY(-2px)",
-                        boxShadow: "0px 12px 32px rgba(0,0,0,0.3)",
-                      },
-                      "&:active": {
-                        transform: "translateY(0)",
+                        boxShadow: "0px 12px 32px rgba(30,58,95,0.45)",
                       },
                     }}
                   >
-                    {loading ? "Signing in..." : "Sign In"}
+                    {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
                   </Button>
 
                   <Box sx={{ mt: 4, textAlign: "center" }}>
@@ -410,12 +376,12 @@ export default function Login() {
                       color="text.secondary"
                       sx={{ fontSize: "0.95rem" }}
                     >
-                      Don't have an account?{" "}
+                      ¿No tienes una cuenta?{" "}
                       <Box
                         component={Link}
                         to="/register"
                         sx={{
-                          color: "black",
+                          color: "primary.main",
                           fontWeight: 600,
                           textDecoration: "none",
                           transition: "opacity 0.2s ease",
@@ -424,7 +390,7 @@ export default function Login() {
                           },
                         }}
                       >
-                        Create Account
+                        Crear Cuenta
                       </Box>
                     </Typography>
                   </Box>

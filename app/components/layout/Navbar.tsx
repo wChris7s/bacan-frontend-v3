@@ -25,6 +25,7 @@ import {
   Menu as MenuIcon,
   ShoppingCart,
   Store,
+  Storefront,
 } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "~/store/authStore";
@@ -37,8 +38,14 @@ export function Navbar() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const { user, logout, isEntrepreneur, isCustomer, isAuthenticated } =
-    useAuthStore();
+  const {
+    user,
+    logout,
+    isEntrepreneur,
+    isCustomer,
+    isAuthenticated,
+    isHydrated,
+  } = useAuthStore();
   const cart = useCartStore((state) => state.cart);
   const clearLocalCart = useCartStore((state) => state.clearLocalCart);
 
@@ -57,7 +64,7 @@ export function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   const navButtonStyles = (path: string) => ({
-    color: "black",
+    color: "white",
     fontWeight: isActive(path) ? 700 : 500,
     position: "relative",
     px: 2.5,
@@ -74,12 +81,12 @@ export function Navbar() {
         : "translateX(-50%) scaleX(0)",
       width: "60%",
       height: "2px",
-      bgcolor: "black",
+      bgcolor: "secondary.main",
       borderRadius: 1,
       transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     },
     "&:hover": {
-      bgcolor: "rgba(0,0,0,0.04)",
+      bgcolor: "rgba(255,255,255,0.1)",
       "&::after": {
         transform: "translateX(-50%) scaleX(1)",
       },
@@ -104,22 +111,27 @@ export function Navbar() {
           alignItems: "center",
           borderBottom: "1px solid",
           borderColor: "divider",
+          background: "linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)",
+          color: "white",
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 800 }}>
           BACAN
         </Typography>
-        <IconButton onClick={() => setMobileOpen(false)}>
+        <IconButton
+          onClick={() => setMobileOpen(false)}
+          sx={{ color: "white" }}
+        >
           <Close />
         </IconButton>
       </Box>
 
-      {user && (
+      {isHydrated && user && (
         <Box
           sx={{
             p: 2,
             m: 2,
-            bgcolor: "black",
+            background: "linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)",
             color: "white",
             borderRadius: 3,
           }}
@@ -128,7 +140,7 @@ export function Navbar() {
             variant="body2"
             sx={{ opacity: 0.7, fontSize: "0.75rem" }}
           >
-            Signed in as
+            Conectado como
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: 700 }}>
             {user.firstName} {user.lastName}
@@ -149,13 +161,31 @@ export function Navbar() {
             sx={{
               borderRadius: 2,
               mb: 0.5,
-              bgcolor: isActive("/") ? "rgba(0,0,0,0.05)" : "transparent",
+              bgcolor: isActive("/") ? "rgba(30,58,95,0.1)" : "transparent",
             }}
           >
             <ListItemIcon>
-              <Home />
+              <Home sx={{ color: "primary.main" }} />
             </ListItemIcon>
-            <ListItemText primary="Home" />
+            <ListItemText primary="Inicio" />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => handleNavigate("/ventures")}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              bgcolor: isActive("/ventures")
+                ? "rgba(30,58,95,0.1)"
+                : "transparent",
+            }}
+          >
+            <ListItemIcon>
+              <Storefront sx={{ color: "primary.main" }} />
+            </ListItemIcon>
+            <ListItemText primary="Emprendimientos" />
           </ListItemButton>
         </ListItem>
 
@@ -166,18 +196,18 @@ export function Navbar() {
               borderRadius: 2,
               mb: 0.5,
               bgcolor: isActive("/products")
-                ? "rgba(0,0,0,0.05)"
+                ? "rgba(30,58,95,0.1)"
                 : "transparent",
             }}
           >
             <ListItemIcon>
-              <Store />
+              <Store sx={{ color: "primary.main" }} />
             </ListItemIcon>
-            <ListItemText primary="Products" />
+            <ListItemText primary="Productos" />
           </ListItemButton>
         </ListItem>
 
-        {user && isEntrepreneur() && (
+        {isHydrated && user && isEntrepreneur() && (
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleNavigate("/dashboard")}
@@ -185,59 +215,61 @@ export function Navbar() {
                 borderRadius: 2,
                 mb: 0.5,
                 bgcolor: isActive("/dashboard")
-                  ? "rgba(0,0,0,0.05)"
+                  ? "rgba(30,58,95,0.1)"
                   : "transparent",
               }}
             >
               <ListItemIcon>
-                <Dashboard />
+                <Dashboard sx={{ color: "primary.main" }} />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <ListItemText primary="Mi Panel" />
             </ListItemButton>
           </ListItem>
         )}
 
-        {user && isCustomer() && (
+        {isHydrated && user && isCustomer() && (
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => handleNavigate("/cart")}
               sx={{
                 borderRadius: 2,
                 mb: 0.5,
-                bgcolor: isActive("/cart") ? "rgba(0,0,0,0.05)" : "transparent",
+                bgcolor: isActive("/cart")
+                  ? "rgba(30,58,95,0.1)"
+                  : "transparent",
               }}
             >
               <ListItemIcon>
-                <Badge badgeContent={cart?.totalItems || 0} color="primary">
-                  <ShoppingCart />
+                <Badge badgeContent={cart?.totalItems || 0} color="secondary">
+                  <ShoppingCart sx={{ color: "primary.main" }} />
                 </Badge>
               </ListItemIcon>
-              <ListItemText primary="Cart" />
+              <ListItemText primary="Carrito" />
             </ListItemButton>
           </ListItem>
         )}
       </List>
 
       <Box sx={{ p: 2, borderTop: "1px solid", borderColor: "divider" }}>
-        {user ? (
+        {isHydrated && user ? (
           <Button
             fullWidth
             variant="outlined"
             startIcon={<Logout />}
             onClick={handleLogout}
             sx={{
-              borderColor: "black",
-              color: "black",
+              borderColor: "primary.main",
+              color: "primary.main",
               borderRadius: 2,
               py: 1.2,
               "&:hover": {
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 color: "white",
-                borderColor: "black",
+                borderColor: "primary.main",
               },
             }}
           >
-            Sign Out
+            Cerrar Sesión
           </Button>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
@@ -246,31 +278,31 @@ export function Navbar() {
               variant="contained"
               onClick={() => handleNavigate("/login")}
               sx={{
-                bgcolor: "black",
+                bgcolor: "primary.main",
                 borderRadius: 2,
                 py: 1.2,
                 "&:hover": {
-                  bgcolor: "#333",
+                  bgcolor: "primary.dark",
                 },
               }}
             >
-              Sign In
+              Iniciar Sesión
             </Button>
             <Button
               fullWidth
               variant="outlined"
               onClick={() => handleNavigate("/register")}
               sx={{
-                borderColor: "black",
-                color: "black",
+                borderColor: "primary.main",
+                color: "primary.main",
                 borderRadius: 2,
                 py: 1.2,
                 "&:hover": {
-                  bgcolor: "rgba(0,0,0,0.05)",
+                  bgcolor: "rgba(30,58,95,0.05)",
                 },
               }}
             >
-              Register
+              Registrarse
             </Button>
           </Box>
         )}
@@ -282,13 +314,10 @@ export function Navbar() {
     <>
       <AppBar
         position="sticky"
-        color="inherit"
         elevation={0}
         sx={{
-          bgcolor: "rgba(255,255,255,0.95)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid",
-          borderColor: "rgba(0,0,0,0.08)",
+          background: "linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
         }}
       >
         <Toolbar sx={{ py: 1.5, px: { xs: 2, md: 4 } }}>
@@ -299,16 +328,20 @@ export function Navbar() {
               flexGrow: 1,
               cursor: "pointer",
               fontWeight: 900,
-              color: "black",
+              color: "white",
               letterSpacing: "-0.04em",
               fontSize: { xs: "1.5rem", md: "1.75rem" },
               transition: "all 0.3s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
               "&:hover": {
-                opacity: 0.7,
+                opacity: 0.9,
               },
             }}
             onClick={() => navigate("/")}
           >
+            <Storefront sx={{ fontSize: 32 }} />
             BACAN
           </Typography>
 
@@ -316,16 +349,16 @@ export function Navbar() {
             <IconButton
               onClick={() => setMobileOpen(true)}
               sx={{
-                color: "black",
+                color: "white",
                 border: "2px solid",
-                borderColor: "rgba(0,0,0,0.1)",
+                borderColor: "rgba(255,255,255,0.3)",
                 borderRadius: 2,
                 p: 1,
               }}
             >
               <MenuIcon />
             </IconButton>
-          ) : isAuthenticated && user ? (
+          ) : isHydrated && isAuthenticated && user ? (
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               <Box
                 sx={{
@@ -334,11 +367,10 @@ export function Navbar() {
                   gap: 1.5,
                   px: 2.5,
                   py: 1,
-                  bgcolor: "black",
-                  color: "white",
+                  bgcolor: "rgba(255,255,255,0.15)",
                   borderRadius: 3,
                   mr: 2,
-                  boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 <Box
@@ -350,10 +382,22 @@ export function Navbar() {
                     boxShadow: "0 0 8px #4ade80",
                   }}
                 />
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, color: "white" }}
+                >
                   {user.firstName} {user.lastName}
                 </Typography>
               </Box>
+
+              <Button
+                color="inherit"
+                startIcon={<Storefront />}
+                onClick={() => navigate("/ventures")}
+                sx={navButtonStyles("/ventures")}
+              >
+                Emprendimientos
+              </Button>
 
               <Button
                 color="inherit"
@@ -361,7 +405,7 @@ export function Navbar() {
                 onClick={() => navigate("/products")}
                 sx={navButtonStyles("/products")}
               >
-                Products
+                Productos
               </Button>
 
               {isEntrepreneur() && (
@@ -371,7 +415,7 @@ export function Navbar() {
                   onClick={() => navigate("/dashboard")}
                   sx={navButtonStyles("/dashboard")}
                 >
-                  Dashboard
+                  Mi Panel
                 </Button>
               )}
 
@@ -379,10 +423,10 @@ export function Navbar() {
                 <IconButton
                   onClick={() => navigate("/cart")}
                   sx={{
-                    color: "black",
+                    color: "white",
                     transition: "all 0.3s ease",
                     "&:hover": {
-                      bgcolor: "rgba(0,0,0,0.05)",
+                      bgcolor: "rgba(255,255,255,0.1)",
                       transform: "scale(1.1)",
                     },
                   }}
@@ -391,7 +435,7 @@ export function Navbar() {
                     badgeContent={cart?.totalItems || 0}
                     sx={{
                       "& .MuiBadge-badge": {
-                        bgcolor: "black",
+                        bgcolor: "secondary.main",
                         color: "white",
                         fontWeight: 700,
                         fontSize: "0.7rem",
@@ -406,12 +450,12 @@ export function Navbar() {
               <IconButton
                 onClick={handleLogout}
                 sx={{
-                  color: "black",
+                  color: "white",
                   ml: 1,
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    bgcolor: "rgba(239,68,68,0.1)",
-                    color: "#ef4444",
+                    bgcolor: "rgba(239,68,68,0.2)",
+                    color: "#fca5a5",
                   },
                 }}
               >
@@ -419,43 +463,52 @@ export function Navbar() {
               </IconButton>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Button
+                color="inherit"
+                startIcon={<Storefront />}
+                onClick={() => navigate("/ventures")}
+                sx={navButtonStyles("/ventures")}
+              >
+                Emprendimientos
+              </Button>
+
               <Button
                 color="inherit"
                 startIcon={<LoginIcon />}
                 onClick={() => navigate("/login")}
                 sx={{
-                  color: "black",
+                  color: "white",
                   fontWeight: 600,
                   px: 3,
                   borderRadius: 2,
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    bgcolor: "rgba(0,0,0,0.05)",
+                    bgcolor: "rgba(255,255,255,0.1)",
                   },
                 }}
               >
-                Sign In
+                Iniciar Sesión
               </Button>
               <Button
                 variant="contained"
                 onClick={() => navigate("/register")}
                 sx={{
-                  bgcolor: "black",
+                  bgcolor: "secondary.main",
                   color: "white",
                   fontWeight: 600,
                   px: 3,
                   borderRadius: 2,
-                  boxShadow: "0px 4px 14px rgba(0,0,0,0.25)",
+                  boxShadow: "0px 4px 14px rgba(255,152,0,0.4)",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    bgcolor: "#1a1a1a",
+                    bgcolor: "secondary.dark",
                     transform: "translateY(-2px)",
-                    boxShadow: "0px 6px 20px rgba(0,0,0,0.3)",
+                    boxShadow: "0px 6px 20px rgba(255,152,0,0.5)",
                   },
                 }}
               >
-                Get Started
+                Comenzar
               </Button>
             </Box>
           )}

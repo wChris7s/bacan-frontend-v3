@@ -1,7 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import {
   Box,
   Button,
   Card,
+  CardContent,
+  Chip,
   Container,
   Grid,
   keyframes,
@@ -9,15 +12,21 @@ import {
 } from "@mui/material";
 import {
   ArrowForward,
-  Bolt,
+  Groups,
+  Handshake,
   LocalShipping,
+  Rocket,
   Security,
   ShoppingBag,
-  Store,
+  Speed,
+  Storefront,
   TrendingUp,
+  Verified,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "~/store/authStore";
+import { apiClient } from "~/lib/api/client";
+import { ImageWithLoader } from "~/components/common/ImageWithLoader";
 
 const fadeInUp = keyframes`
   from {
@@ -59,48 +68,107 @@ const shimmer = keyframes`
 
 export default function Home() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isEntrepreneur, isCustomer } = useAuthStore();
+  const { user, isAuthenticated, isEntrepreneur, isCustomer, isHydrated } =
+    useAuthStore();
+
+  // Obtener algunos emprendimientos destacados
+  const { data: ventures = [] } = useQuery({
+    queryKey: ["featured-ventures"],
+    queryFn: () => apiClient.getVentures(),
+  });
+
+  // Obtener algunas categorías
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => apiClient.getCategories(),
+  });
+
+  const featuredVentures = ventures.slice(0, 3);
 
   const features = [
     {
-      icon: <Store sx={{ fontSize: 36, color: "white" }} />,
-      title: "For Entrepreneurs",
+      icon: <Storefront sx={{ fontSize: 36, color: "white" }} />,
+      title: "Para Emprendedores",
       description:
-        "Launch your venture, curate your products, and connect with customers through our powerful platform.",
-      delay: "0s",
+        "Crea tu emprendimiento, gestiona tus productos y conecta con clientes de todo el país.",
+      color: "#1e3a5f",
     },
     {
       icon: <ShoppingBag sx={{ fontSize: 36, color: "white" }} />,
-      title: "For Customers",
+      title: "Para Compradores",
       description:
-        "Discover unique products from passionate entrepreneurs and support small businesses worldwide.",
-      delay: "0.1s",
+        "Descubre productos únicos de emprendedores locales y apoya el comercio local.",
+      color: "#2d5a87",
     },
     {
       icon: <TrendingUp sx={{ fontSize: 36, color: "white" }} />,
-      title: "Easy to Scale",
+      title: "Crece con Nosotros",
       description:
-        "From your first sale to your millionth - our platform grows with your business ambitions.",
-      delay: "0.2s",
+        "Desde tu primera venta hasta tu millonésima - nuestra plataforma crece contigo.",
+      color: "#3d7ab7",
+    },
+  ];
+
+  const benefits = [
+    {
+      icon: <Speed />,
+      title: "Rápido y Fácil",
+      desc: "Configura tu tienda en minutos",
+    },
+    {
+      icon: <Security />,
+      title: "100% Seguro",
+      desc: "Transacciones protegidas",
+    },
+    {
+      icon: <LocalShipping />,
+      title: "Envíos Nacionales",
+      desc: "Llega a todo el país",
+    },
+    {
+      icon: <Handshake />,
+      title: "Apoyo Local",
+      desc: "Impulsa la economía local",
     },
   ];
 
   const stats = [
-    { value: "10K+", label: "Active Sellers" },
-    { value: "50K+", label: "Products" },
-    { value: "99%", label: "Satisfaction" },
-    { value: "24/7", label: "Support" },
+    { value: "500+", label: "Emprendimientos Activos" },
+    { value: "2,000+", label: "Productos Disponibles" },
+    { value: "98%", label: "Clientes Satisfechos" },
+    { value: "24/7", label: "Soporte Disponible" },
+  ];
+
+  const testimonials = [
+    {
+      name: "María García",
+      role: "Emprendedora de Artesanías",
+      text: "Gracias a Bacan pude llevar mis productos artesanales a todo el país. ¡Mi negocio creció un 200%!",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
+    {
+      name: "Carlos Rodríguez",
+      role: "Productor de Alimentos",
+      text: "La plataforma es muy fácil de usar. En pocas horas ya tenía mi tienda funcionando.",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    },
+    {
+      name: "Ana Martínez",
+      role: "Diseñadora de Moda",
+      text: "Encontré una comunidad increíble de emprendedores. El soporte es excelente.",
+      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+    },
   ];
 
   return (
-    <Box sx={{ bgcolor: "white", overflow: "hidden" }}>
+    <Box sx={{ bgcolor: "background.default", overflow: "hidden" }}>
       {/* Hero Section */}
       <Box
         sx={{
           background:
-            "linear-gradient(160deg, #000000 0%, #0a0a0a 40%, #141414 100%)",
+            "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 40%, #3d7ab7 100%)",
           color: "white",
-          py: { xs: 12, md: 18 },
+          py: { xs: 10, md: 16 },
           position: "relative",
           overflow: "hidden",
         }}
@@ -115,7 +183,7 @@ export default function Home() {
             height: 400,
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)",
+              "radial-gradient(circle, rgba(255,152,0,0.2) 0%, transparent 70%)",
             animation: `${float} 8s ease-in-out infinite`,
           }}
         />
@@ -132,19 +200,6 @@ export default function Home() {
             animation: `${float} 10s ease-in-out infinite reverse`,
           }}
         />
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "100%",
-            height: "100%",
-            background:
-              "radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, transparent 60%)",
-            animation: `${pulse} 4s ease-in-out infinite`,
-          }}
-        />
 
         {/* Grid pattern overlay */}
         <Box
@@ -152,8 +207,8 @@ export default function Home() {
             position: "absolute",
             inset: 0,
             backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+              linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
             `,
             backgroundSize: "60px 60px",
             opacity: 0.5,
@@ -162,67 +217,68 @@ export default function Home() {
 
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
           <Box sx={{ maxWidth: 900, mx: "auto", textAlign: "center" }}>
-            <Typography
+            <Chip
+              icon={<Rocket sx={{ color: "white !important" }} />}
+              label="Plataforma para Emprendedores"
               sx={{
-                display: "inline-block",
-                px: 3,
-                py: 1,
                 mb: 4,
-                fontSize: "0.85rem",
+                px: 2,
+                py: 2.5,
+                fontSize: "0.9rem",
                 fontWeight: 600,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                border: "1px solid rgba(255,255,255,0.2)",
-                borderRadius: 10,
-                bgcolor: "rgba(255,255,255,0.05)",
+                bgcolor: "rgba(255,152,0,0.2)",
+                color: "white",
+                border: "1px solid rgba(255,152,0,0.4)",
                 animation: `${fadeInUp} 0.8s ease-out`,
+                "& .MuiChip-icon": {
+                  color: "white",
+                },
               }}
-            >
-              ✨ The Future of Commerce
-            </Typography>
+            />
 
             <Typography
               variant="h1"
               sx={{
-                fontSize: { xs: "3rem", sm: "4rem", md: "5.5rem" },
+                fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem" },
                 fontWeight: 900,
                 mb: 3,
                 letterSpacing: "-0.04em",
-                lineHeight: 1.05,
+                lineHeight: 1.1,
                 animation: `${fadeInUp} 0.8s ease-out 0.1s both`,
               }}
             >
-              Welcome to{" "}
+              Impulsa tu{" "}
               <Box
                 component="span"
                 sx={{
                   background:
-                    "linear-gradient(90deg, #fff 0%, #888 50%, #fff 100%)",
+                    "linear-gradient(90deg, #ff9800 0%, #ffb74d 50%, #ff9800 100%)",
                   backgroundSize: "200% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   animation: `${shimmer} 3s linear infinite`,
                 }}
               >
-                Bacan
+                Emprendimiento
               </Box>
             </Typography>
 
             <Typography
               variant="h5"
               sx={{
-                fontSize: { xs: "1.1rem", md: "1.5rem" },
-                mb: 6,
-                opacity: 0.75,
+                fontSize: { xs: "1rem", md: "1.35rem" },
+                mb: 5,
+                opacity: 0.9,
                 fontWeight: 400,
-                maxWidth: 600,
+                maxWidth: 650,
                 mx: "auto",
-                lineHeight: 1.6,
+                lineHeight: 1.7,
                 animation: `${fadeInUp} 0.8s ease-out 0.2s both`,
               }}
             >
-              Where visionary entrepreneurs meet discerning customers in a
-              modern marketplace experience
+              La plataforma que conecta emprendedores con clientes. Crea tu
+              tienda, vende tus productos y haz crecer tu negocio sin
+              complicaciones.
             </Typography>
 
             <Box
@@ -234,37 +290,37 @@ export default function Home() {
                 animation: `${fadeInUp} 0.8s ease-out 0.3s both`,
               }}
             >
-              {isAuthenticated && user ? (
+              {isHydrated && isAuthenticated && user ? (
                 <>
                   <Button
                     variant="contained"
                     size="large"
                     endIcon={<ArrowForward />}
                     sx={{
-                      bgcolor: "white",
-                      color: "black",
+                      bgcolor: "#ff9800",
+                      color: "white",
                       px: 5,
                       py: 2,
                       fontSize: "1.1rem",
                       fontWeight: 700,
                       borderRadius: 3,
-                      boxShadow: "0px 8px 30px rgba(255,255,255,0.2)",
+                      boxShadow: "0px 8px 30px rgba(255,152,0,0.4)",
                       transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": {
-                        bgcolor: "#f0f0f0",
+                        bgcolor: "#f57c00",
                         transform: "translateY(-4px)",
-                        boxShadow: "0px 16px 40px rgba(255,255,255,0.25)",
+                        boxShadow: "0px 16px 40px rgba(255,152,0,0.5)",
                       },
                     }}
-                    onClick={() => navigate("/products")}
+                    onClick={() => navigate("/ventures")}
                   >
-                    Browse Products
+                    Explorar Emprendimientos
                   </Button>
                   <Button
                     variant="outlined"
                     size="large"
                     sx={{
-                      borderColor: "rgba(255,255,255,0.4)",
+                      borderColor: "rgba(255,255,255,0.5)",
                       borderWidth: 2,
                       color: "white",
                       px: 5,
@@ -281,10 +337,10 @@ export default function Home() {
                       },
                     }}
                     onClick={() =>
-                      navigate(isEntrepreneur() ? "/dashboard" : "/cart")
+                      navigate(isEntrepreneur() ? "/dashboard" : "/products")
                     }
                   >
-                    {isEntrepreneur() ? "Go to Dashboard" : "View Cart"}
+                    {isEntrepreneur() ? "Ir a Mi Panel" : "Ver Productos"}
                   </Button>
                 </>
               ) : (
@@ -294,30 +350,30 @@ export default function Home() {
                     size="large"
                     endIcon={<ArrowForward />}
                     sx={{
-                      bgcolor: "white",
-                      color: "black",
+                      bgcolor: "#ff9800",
+                      color: "white",
                       px: 5,
                       py: 2,
                       fontSize: "1.1rem",
                       fontWeight: 700,
                       borderRadius: 3,
-                      boxShadow: "0px 8px 30px rgba(255,255,255,0.2)",
+                      boxShadow: "0px 8px 30px rgba(255,152,0,0.4)",
                       transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": {
-                        bgcolor: "#f0f0f0",
+                        bgcolor: "#f57c00",
                         transform: "translateY(-4px)",
-                        boxShadow: "0px 16px 40px rgba(255,255,255,0.25)",
+                        boxShadow: "0px 16px 40px rgba(255,152,0,0.5)",
                       },
                     }}
                     onClick={() => navigate("/register")}
                   >
-                    Get Started Free
+                    Comenzar Gratis
                   </Button>
                   <Button
                     variant="outlined"
                     size="large"
                     sx={{
-                      borderColor: "rgba(255,255,255,0.4)",
+                      borderColor: "rgba(255,255,255,0.5)",
                       borderWidth: 2,
                       color: "white",
                       px: 5,
@@ -333,9 +389,9 @@ export default function Home() {
                         transform: "translateY(-4px)",
                       },
                     }}
-                    onClick={() => navigate("/products")}
+                    onClick={() => navigate("/ventures")}
                   >
-                    Browse Products
+                    Explorar Emprendimientos
                   </Button>
                 </>
               )}
@@ -360,6 +416,7 @@ export default function Home() {
                     fontSize: { xs: "2rem", md: "2.5rem" },
                     fontWeight: 800,
                     letterSpacing: "-0.02em",
+                    color: "#ff9800",
                   }}
                 >
                   {stat.value}
@@ -367,7 +424,7 @@ export default function Home() {
                 <Typography
                   sx={{
                     fontSize: "0.9rem",
-                    opacity: 0.6,
+                    opacity: 0.8,
                     fontWeight: 500,
                   }}
                 >
@@ -379,186 +436,346 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* Features Section */}
-      <Container maxWidth="lg" sx={{ py: { xs: 10, md: 16 } }}>
-        <Box sx={{ textAlign: "center", mb: 10 }}>
-          <Typography
-            sx={{
-              display: "inline-block",
-              px: 2,
-              py: 0.5,
-              mb: 2,
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: "text.secondary",
-              bgcolor: "rgba(0,0,0,0.05)",
-              borderRadius: 2,
-            }}
-          >
-            Why Bacan
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: "2.5rem", md: "3.5rem" },
-              fontWeight: 800,
-              mb: 2,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            Built for Success
-          </Typography>
-          <Typography
-            color="text.secondary"
-            sx={{
-              fontSize: { xs: "1.1rem", md: "1.25rem" },
-              maxWidth: 600,
-              mx: "auto",
-              lineHeight: 1.7,
-            }}
-          >
-            Everything you need to launch, grow, and scale your business
-          </Typography>
-        </Box>
+      {/* Categories Section */}
+      {categories.length > 0 && (
+        <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 800,
+                mb: 2,
+                color: "primary.main",
+              }}
+            >
+              Explora por Categoría
+            </Typography>
+            <Typography
+              color="text.secondary"
+              sx={{ fontSize: "1.1rem", maxWidth: 500, mx: "auto" }}
+            >
+              Encuentra emprendimientos y productos en las categorías que más te
+              interesan
+            </Typography>
+          </Box>
 
-        <Grid container spacing={4}>
-          {features.map((feature, index) => (
-            <Grid size={{ xs: 12, md: 4 }} key={index}>
-              <Card
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
+              justifyContent: "center",
+            }}
+          >
+            {categories.map((category) => (
+              <Chip
+                key={category.externalId}
+                label={category.name}
+                onClick={() =>
+                  navigate(`/ventures?category=${category.externalId}`)
+                }
                 sx={{
-                  height: "100%",
-                  textAlign: "center",
-                  p: 5,
+                  px: 3,
+                  py: 3,
+                  fontSize: "1rem",
+                  fontWeight: 600,
                   bgcolor: "white",
-                  border: "1px solid",
-                  borderColor: "rgba(0,0,0,0.08)",
-                  borderRadius: 4,
-                  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                  border: "2px solid",
+                  borderColor: "primary.light",
+                  color: "primary.main",
                   cursor: "pointer",
-                  position: "relative",
-                  overflow: "hidden",
-                  "&::before": {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 4,
-                    background:
-                      "linear-gradient(90deg, #000 0%, #333 50%, #000 100%)",
-                    transform: "scaleX(0)",
-                    transformOrigin: "left",
-                    transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                  },
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    transform: "translateY(-8px)",
-                    boxShadow: "0px 24px 48px rgba(0, 0, 0, 0.12)",
-                    "&::before": {
-                      transform: "scaleX(1)",
-                    },
-                    "& .feature-icon": {
-                      transform: "scale(1.1) rotate(5deg)",
-                    },
+                    bgcolor: "primary.main",
+                    color: "white",
+                    transform: "translateY(-3px)",
+                    boxShadow: "0px 8px 20px rgba(30,58,95,0.3)",
                   },
                 }}
-              >
-                <Box
-                  className="feature-icon"
+              />
+            ))}
+          </Box>
+        </Container>
+      )}
+
+      {/* Features Section */}
+      <Box sx={{ bgcolor: "white", py: { xs: 8, md: 14 } }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: "center", mb: 8 }}>
+            <Chip
+              label="¿Por qué Bacan?"
+              sx={{
+                mb: 2,
+                px: 2,
+                bgcolor: "rgba(30,58,95,0.1)",
+                color: "primary.main",
+                fontWeight: 700,
+              }}
+            />
+            <Typography
+              variant="h2"
+              sx={{
+                fontSize: { xs: "2rem", md: "3rem" },
+                fontWeight: 800,
+                mb: 2,
+                color: "primary.main",
+              }}
+            >
+              Construido para el Éxito
+            </Typography>
+            <Typography
+              color="text.secondary"
+              sx={{
+                fontSize: { xs: "1rem", md: "1.2rem" },
+                maxWidth: 600,
+                mx: "auto",
+                lineHeight: 1.7,
+              }}
+            >
+              Todo lo que necesitas para lanzar, crecer y escalar tu
+              emprendimiento
+            </Typography>
+          </Box>
+
+          <Grid container spacing={4}>
+            {features.map((feature, index) => (
+              <Grid size={{ xs: 12, md: 4 }} key={index}>
+                <Card
                   sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 3,
-                    bgcolor: "black",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mx: "auto",
-                    mb: 3,
-                    boxShadow: "0px 8px 24px rgba(0,0,0,0.2)",
-                    transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                    height: "100%",
+                    textAlign: "center",
+                    p: 4,
+                    bgcolor: "white",
+                    border: "1px solid",
+                    borderColor: "rgba(0,0,0,0.08)",
+                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                    cursor: "pointer",
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 4,
+                      bgcolor: feature.color,
+                      transform: "scaleX(0)",
+                      transformOrigin: "left",
+                      transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                    },
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: "0px 24px 48px rgba(0, 0, 0, 0.12)",
+                      "&::before": {
+                        transform: "scaleX(1)",
+                      },
+                      "& .feature-icon": {
+                        transform: "scale(1.1) rotate(5deg)",
+                      },
+                    },
                   }}
                 >
-                  {feature.icon}
-                </Box>
-                <Typography
-                  variant="h5"
-                  sx={{ fontWeight: 700, mb: 2, letterSpacing: "-0.02em" }}
+                  <Box
+                    className="feature-icon"
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 3,
+                      bgcolor: feature.color,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mx: "auto",
+                      mb: 3,
+                      boxShadow: `0px 8px 24px ${feature.color}40`,
+                      transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                  >
+                    {feature.icon}
+                  </Box>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 700, mb: 2, color: "primary.main" }}
+                  >
+                    {feature.title}
+                  </Typography>
+                  <Typography
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.8, fontSize: "1rem" }}
+                  >
+                    {feature.description}
+                  </Typography>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Featured Ventures Section */}
+      {featuredVentures.length > 0 && (
+        <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 } }}>
+          <Box sx={{ textAlign: "center", mb: 6 }}>
+            <Chip
+              label="Destacados"
+              sx={{
+                mb: 2,
+                px: 2,
+                bgcolor: "secondary.main",
+                color: "white",
+                fontWeight: 700,
+              }}
+            />
+            <Typography
+              variant="h2"
+              sx={{
+                fontSize: { xs: "2rem", md: "3rem" },
+                fontWeight: 800,
+                mb: 2,
+                color: "primary.main",
+              }}
+            >
+              Emprendimientos Destacados
+            </Typography>
+            <Typography
+              color="text.secondary"
+              sx={{ fontSize: "1.1rem", maxWidth: 500, mx: "auto" }}
+            >
+              Conoce algunos de los emprendimientos que están triunfando en
+              nuestra plataforma
+            </Typography>
+          </Box>
+
+          <Grid container spacing={4}>
+            {featuredVentures.map((venture) => (
+              <Grid size={{ xs: 12, md: 4 }} key={venture.externalId}>
+                <Card
+                  onClick={() => navigate(`/ventures/${venture.externalId}`)}
+                  sx={{
+                    height: "100%",
+                    cursor: "pointer",
+                    transition: "all 0.4s ease",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: "0px 20px 40px rgba(0,0,0,0.15)",
+                      "& .venture-image": {
+                        transform: "scale(1.05)",
+                      },
+                    },
+                  }}
                 >
-                  {feature.title}
-                </Typography>
-                <Typography
-                  color="text.secondary"
-                  sx={{ lineHeight: 1.8, fontSize: "1rem" }}
-                >
-                  {feature.description}
-                </Typography>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+                  <Box sx={{ overflow: "hidden" }}>
+                    <ImageWithLoader
+                      src={
+                        venture.imageUrl ||
+                        "https://via.placeholder.com/400x250?text=Emprendimiento"
+                      }
+                      alt={venture.name}
+                      height={200}
+                      className="venture-image"
+                    />
+                  </Box>
+                  <CardContent sx={{ p: 3 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                      {venture.name}
+                    </Typography>
+                    <Typography
+                      color="text.secondary"
+                      sx={{
+                        mb: 2,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {venture.description || "Sin descripción"}
+                    </Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {venture.categories.slice(0, 2).map((cat) => (
+                        <Chip
+                          key={cat.externalId}
+                          label={cat.name}
+                          size="small"
+                          sx={{
+                            bgcolor: "primary.main",
+                            color: "white",
+                            fontWeight: 600,
+                            fontSize: "0.7rem",
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box sx={{ textAlign: "center", mt: 5 }}>
+            <Button
+              variant="outlined"
+              size="large"
+              endIcon={<ArrowForward />}
+              onClick={() => navigate("/ventures")}
+              sx={{
+                px: 4,
+                py: 1.5,
+                borderColor: "primary.main",
+                color: "primary.main",
+                fontWeight: 600,
+                borderWidth: 2,
+                "&:hover": {
+                  borderWidth: 2,
+                  bgcolor: "primary.main",
+                  color: "white",
+                },
+              }}
+            >
+              Ver Todos los Emprendimientos
+            </Button>
+          </Box>
+        </Container>
+      )}
 
       {/* Benefits Section */}
-      <Box sx={{ bgcolor: "#fafafa", py: { xs: 10, md: 16 } }}>
+      <Box sx={{ bgcolor: "#f1f5f9", py: { xs: 8, md: 12 } }}>
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center">
             <Grid size={{ xs: 12, md: 6 }}>
-              <Typography
+              <Chip
+                label="Beneficios"
                 sx={{
-                  display: "inline-block",
-                  px: 2,
-                  py: 0.5,
                   mb: 2,
-                  fontSize: "0.8rem",
+                  px: 2,
+                  bgcolor: "secondary.main",
+                  color: "white",
                   fontWeight: 700,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  color: "text.secondary",
-                  bgcolor: "rgba(0,0,0,0.05)",
-                  borderRadius: 2,
                 }}
-              >
-                Benefits
-              </Typography>
+              />
               <Typography
                 variant="h3"
                 sx={{
                   fontWeight: 800,
                   mb: 3,
-                  letterSpacing: "-0.03em",
-                  fontSize: { xs: "2rem", md: "2.75rem" },
+                  color: "primary.main",
+                  fontSize: { xs: "1.8rem", md: "2.5rem" },
                 }}
               >
-                Everything you need to succeed
+                Todo lo que necesitas para triunfar
               </Typography>
               <Typography
                 color="text.secondary"
                 sx={{ mb: 4, fontSize: "1.1rem", lineHeight: 1.8 }}
               >
-                From secure payments to fast shipping, we've got all the tools
-                you need to run a successful online business.
+                Desde pagos seguros hasta envíos nacionales, tenemos todas las
+                herramientas que necesitas para llevar tu emprendimiento al
+                siguiente nivel.
               </Typography>
 
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                {[
-                  {
-                    icon: <Bolt />,
-                    title: "Lightning Fast",
-                    desc: "Quick setup and instant payouts",
-                  },
-                  {
-                    icon: <Security />,
-                    title: "Secure & Safe",
-                    desc: "Enterprise-grade security for all transactions",
-                  },
-                  {
-                    icon: <LocalShipping />,
-                    title: "Global Reach",
-                    desc: "Ship to customers worldwide",
-                  },
-                ].map((item, index) => (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {benefits.map((item, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -581,7 +798,7 @@ export default function Home() {
                         width: 48,
                         height: 48,
                         borderRadius: 2,
-                        bgcolor: "black",
+                        bgcolor: "primary.main",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -592,7 +809,9 @@ export default function Home() {
                       {item.icon}
                     </Box>
                     <Box>
-                      <Typography sx={{ fontWeight: 700, mb: 0.5 }}>
+                      <Typography
+                        sx={{ fontWeight: 700, mb: 0.5, color: "primary.main" }}
+                      >
                         {item.title}
                       </Typography>
                       <Typography
@@ -616,7 +835,7 @@ export default function Home() {
                     position: "absolute",
                     inset: -20,
                     background:
-                      "linear-gradient(135deg, rgba(0,0,0,0.05) 0%, transparent 50%)",
+                      "linear-gradient(135deg, rgba(30,58,95,0.1) 0%, transparent 50%)",
                     borderRadius: 6,
                   },
                 }}
@@ -624,31 +843,77 @@ export default function Home() {
                 <Box
                   sx={{
                     position: "relative",
-                    bgcolor: "black",
+                    background:
+                      "linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)",
                     borderRadius: 5,
                     p: 6,
                     color: "white",
                     textAlign: "center",
-                    boxShadow: "0px 32px 64px rgba(0,0,0,0.2)",
+                    boxShadow: "0px 32px 64px rgba(30,58,95,0.3)",
                   }}
                 >
                   <Typography
                     sx={{
-                      fontSize: "5rem",
+                      fontSize: "4rem",
                       fontWeight: 900,
                       letterSpacing: "-0.04em",
                       lineHeight: 1,
                       mb: 2,
+                      color: "#ff9800",
                     }}
                   >
                     0%
                   </Typography>
-                  <Typography sx={{ fontSize: "1.25rem", opacity: 0.9, mb: 1 }}>
-                    Commission Fee
+                  <Typography
+                    sx={{
+                      fontSize: "1.5rem",
+                      opacity: 0.9,
+                      mb: 1,
+                      fontWeight: 700,
+                    }}
+                  >
+                    Comisión
                   </Typography>
-                  <Typography sx={{ fontSize: "0.9rem", opacity: 0.6 }}>
-                    Keep 100% of your earnings
+                  <Typography sx={{ fontSize: "1rem", opacity: 0.7 }}>
+                    Quédate con el 100% de tus ganancias
                   </Typography>
+
+                  <Box
+                    sx={{
+                      mt: 4,
+                      pt: 4,
+                      borderTop: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", gap: 4 }}
+                    >
+                      <Box sx={{ textAlign: "center" }}>
+                        <Verified
+                          sx={{ fontSize: 32, color: "#4ade80", mb: 1 }}
+                        />
+                        <Typography sx={{ fontSize: "0.85rem", opacity: 0.8 }}>
+                          Verificado
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: "center" }}>
+                        <Groups
+                          sx={{ fontSize: 32, color: "#60a5fa", mb: 1 }}
+                        />
+                        <Typography sx={{ fontSize: "0.85rem", opacity: 0.8 }}>
+                          Comunidad
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: "center" }}>
+                        <TrendingUp
+                          sx={{ fontSize: 32, color: "#fbbf24", mb: 1 }}
+                        />
+                        <Typography sx={{ fontSize: "0.85rem", opacity: 0.8 }}>
+                          Crecimiento
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </Grid>
@@ -656,12 +921,88 @@ export default function Home() {
         </Container>
       </Box>
 
+      {/* Testimonials Section */}
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 } }}>
+        <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Chip
+            label="Testimonios"
+            sx={{
+              mb: 2,
+              px: 2,
+              bgcolor: "rgba(30,58,95,0.1)",
+              color: "primary.main",
+              fontWeight: 700,
+            }}
+          />
+          <Typography
+            variant="h2"
+            sx={{
+              fontSize: { xs: "2rem", md: "3rem" },
+              fontWeight: 800,
+              mb: 2,
+              color: "primary.main",
+            }}
+          >
+            Lo que Dicen Nuestros Emprendedores
+          </Typography>
+        </Box>
+
+        <Grid container spacing={4}>
+          {testimonials.map((testimonial, index) => (
+            <Grid size={{ xs: 12, md: 4 }} key={index}>
+              <Card
+                sx={{
+                  height: "100%",
+                  p: 4,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0px 16px 32px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "1.1rem",
+                    lineHeight: 1.8,
+                    mb: 3,
+                    color: "text.secondary",
+                    fontStyle: "italic",
+                  }}
+                >
+                  "{testimonial.text}"
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <ImageWithLoader
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    width={50}
+                    height={50}
+                    borderRadius="50%"
+                  />
+                  <Box>
+                    <Typography sx={{ fontWeight: 700, color: "primary.main" }}>
+                      {testimonial.name}
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "0.85rem", color: "text.secondary" }}
+                    >
+                      {testimonial.role}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+
       {/* CTA Section */}
       <Box
         sx={{
           background:
-            "linear-gradient(160deg, #000000 0%, #0a0a0a 40%, #141414 100%)",
-          py: { xs: 10, md: 14 },
+            "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 40%, #3d7ab7 100%)",
+          py: { xs: 8, md: 12 },
           position: "relative",
           overflow: "hidden",
         }}
@@ -675,7 +1016,7 @@ export default function Home() {
             width: "150%",
             height: "150%",
             background:
-              "radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 50%)",
+              "radial-gradient(ellipse at center, rgba(255,152,0,0.1) 0%, transparent 50%)",
           }}
         />
 
@@ -686,57 +1027,57 @@ export default function Home() {
           <Typography
             variant="h2"
             sx={{
-              fontSize: { xs: "2.5rem", md: "4rem" },
+              fontSize: { xs: "2rem", md: "3.5rem" },
               fontWeight: 800,
               mb: 3,
               color: "white",
-              letterSpacing: "-0.03em",
             }}
           >
-            Ready to Launch?
+            ¿Listo para Emprender?
           </Typography>
           <Typography
             sx={{
               mb: 5,
-              fontSize: { xs: "1.1rem", md: "1.35rem" },
-              color: "rgba(255,255,255,0.7)",
+              fontSize: { xs: "1rem", md: "1.25rem" },
+              color: "rgba(255,255,255,0.8)",
               maxWidth: 500,
               mx: "auto",
             }}
           >
-            Join thousands of entrepreneurs building their dreams on Bacan
+            Únete a cientos de emprendedores que ya están construyendo sus
+            sueños en Bacan
           </Typography>
-          {!isAuthenticated && (
+          {(!isHydrated || !isAuthenticated) && (
             <Button
               variant="contained"
               size="large"
               endIcon={<ArrowForward />}
               sx={{
-                bgcolor: "white",
-                color: "black",
+                bgcolor: "#ff9800",
+                color: "white",
                 px: 6,
                 py: 2,
                 fontSize: "1.15rem",
                 fontWeight: 700,
                 borderRadius: 3,
-                boxShadow: "0px 8px 30px rgba(255,255,255,0.2)",
+                boxShadow: "0px 8px 30px rgba(255,152,0,0.4)",
                 transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
-                  bgcolor: "#f0f0f0",
+                  bgcolor: "#f57c00",
                   transform: "translateY(-4px) scale(1.02)",
-                  boxShadow: "0px 16px 40px rgba(255,255,255,0.25)",
+                  boxShadow: "0px 16px 40px rgba(255,152,0,0.5)",
                 },
               }}
               onClick={() => navigate("/register")}
             >
-              Create Your Account
+              Crear Mi Cuenta Gratis
             </Button>
           )}
         </Container>
       </Box>
 
       {/* Footer */}
-      <Box sx={{ bgcolor: "#000", py: 4 }}>
+      <Box sx={{ bgcolor: "#0d2840", py: 4 }}>
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -747,15 +1088,18 @@ export default function Home() {
               gap: 2,
             }}
           >
-            <Typography
-              sx={{ color: "white", fontWeight: 800, fontSize: "1.25rem" }}
-            >
-              BACAN
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Storefront sx={{ color: "white", fontSize: 28 }} />
+              <Typography
+                sx={{ color: "white", fontWeight: 800, fontSize: "1.25rem" }}
+              >
+                BACAN
+              </Typography>
+            </Box>
             <Typography
               sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem" }}
             >
-              © 2025 Bacan. All rights reserved.
+              © 2025 Bacan. Todos los derechos reservados.
             </Typography>
           </Box>
         </Container>

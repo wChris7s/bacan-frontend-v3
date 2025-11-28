@@ -107,7 +107,7 @@ export default function ForgotPassword() {
       setSuccess("Password reset successfully! Redirecting to login...");
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/ingresar");
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to reset password");
@@ -150,7 +150,7 @@ export default function ForgotPassword() {
         >
           <Button
             component={Link}
-            to="/login"
+            to="/ingresar"
             startIcon={<ArrowBack />}
             sx={{
               mb: 3,

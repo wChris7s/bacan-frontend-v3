@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { Cart } from "~/lib/api/types";
 
 interface CartState {
@@ -16,7 +16,8 @@ export const useCartStore = create<CartState>()(
       clearLocalCart: () => set({ cart: null }),
     }),
     {
-      name: "cart-storage",
+      name: "bacan-cart-storage",
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

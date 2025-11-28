@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 import {
   Alert,
   Box,
@@ -10,22 +9,18 @@ import {
   Chip,
   CircularProgress,
   Container,
-  FormControl,
   Grid,
-  InputLabel,
   keyframes,
-  MenuItem,
-  Select,
   Snackbar,
   Typography,
 } from "@mui/material";
 import {
+  ArrowBack,
   CheckCircle,
-  FilterList,
   ShoppingCart,
-  Store,
   Storefront,
 } from "@mui/icons-material";
+import { useState } from "react";
 import { apiClient } from "~/lib/api/client";
 import { useAuthStore } from "~/store/authStore";
 import { useCartStore } from "~/store/cartStore";
@@ -42,9 +37,9 @@ const fadeInUp = keyframes`
   }
 `;
 
-export default function Products() {
+export default function VentureDetail() {
+  const { ventureId } = useParams();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -60,19 +55,20 @@ export default function Products() {
   const isHydrated = useAuthStore((state) => state.isHydrated);
   const setCart = useCartStore((state) => state.setCart);
 
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => apiClient.getCategories(),
+  const {
+    data: venture,
+    isLoading: ventureLoading,
+    error: ventureError,
+  } = useQuery({
+    queryKey: ["venture", ventureId],
+    queryFn: () => apiClient.getVenture(ventureId!),
+    enabled: !!ventureId,
   });
 
   const { data: products = [], isLoading: productsLoading } = useQuery({
-    queryKey: ["products", selectedCategory],
-    queryFn: () =>
-      apiClient.getProducts(
-        selectedCategory !== "all"
-          ? { categoryExternalId: selectedCategory, available: true }
-          : { available: true }
-      ),
+    queryKey: ["venture-products", ventureId],
+    queryFn: () => apiClient.getProducts({ ventureExternalId: ventureId }),
+    enabled: !!ventureId,
   });
 
   const handleAddToCart = async (productExternalId: string) => {
@@ -108,7 +104,7 @@ export default function Products() {
     }
   };
 
-  if (categoriesLoading || productsLoading) {
+  if (ventureLoading || productsLoading) {
     return (
       <Box
         sx={{
@@ -121,8 +117,60 @@ export default function Products() {
       >
         <Box sx={{ textAlign: "center" }}>
           <CircularProgress sx={{ color: "primary.main", mb: 2 }} size={48} />
-          <Typography color="text.secondary">Cargando productos...</Typography>
+          <Typography color="text.secondary">
+            Cargando emprendimiento...
+          </Typography>
         </Box>
+      </Box>
+    );
+  }
+
+  if (ventureError || !venture) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "calc(100vh - 70px)",
+          bgcolor: "background.default",
+          p: 4,
+        }}
+      >
+        <Box
+          sx={{
+            width: 100,
+            height: 100,
+            borderRadius: "50%",
+            bgcolor: "rgba(244,67,54,0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 3,
+          }}
+        >
+          <Storefront sx={{ fontSize: 50, color: "error.main" }} />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+          Emprendimiento no encontrado
+        </Typography>
+        <Typography color="text.secondary" sx={{ mb: 4 }}>
+          El emprendimiento que buscas no existe o ha sido eliminado
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<ArrowBack />}
+          onClick={() => navigate("/ventures")}
+          sx={{
+            bgcolor: "primary.main",
+            px: 4,
+            py: 1.5,
+            borderRadius: 3,
+          }}
+        >
+          Volver a Emprendimientos
+        </Button>
       </Box>
     );
   }
@@ -131,13 +179,13 @@ export default function Products() {
     <Box
       sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 70px)" }}
     >
-      {/* Header Section */}
+      {/* Header Section with Venture Info */}
       <Box
         sx={{
           background:
             "linear-gradient(160deg, #1e3a5f 0%, #2d5a87 40%, #3d7ab7 100%)",
           color: "white",
-          py: { xs: 6, md: 8 },
+          py: { xs: 4, md: 6 },
           position: "relative",
           overflow: "hidden",
         }}
@@ -154,111 +202,137 @@ export default function Products() {
           }}
         />
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Typography
-            variant="h2"
+          <Button
+            startIcon={<ArrowBack />}
+            onClick={() => navigate("/ventures")}
             sx={{
-              fontWeight: 800,
-              mb: 2,
-              fontSize: { xs: "2rem", md: "3rem" },
-              letterSpacing: "-0.03em",
-              animation: `${fadeInUp} 0.6s ease-out`,
-            }}
-          >
-            Todos los Productos
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: { xs: "1rem", md: "1.2rem" },
-              opacity: 0.9,
-              maxWidth: 600,
-              animation: `${fadeInUp} 0.6s ease-out 0.1s both`,
-            }}
-          >
-            Explora nuestra selección de productos de emprendedores locales.
-            Calidad, originalidad y apoyo al comercio local.
-          </Typography>
-        </Container>
-      </Box>
-
-      <Container maxWidth="lg" sx={{ py: 5 }}>
-        {/* Filter Section */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            mb: 5,
-            p: 3,
-            bgcolor: "white",
-            borderRadius: 3,
-            boxShadow: "0px 4px 20px rgba(0,0,0,0.05)",
-            border: "1px solid rgba(0,0,0,0.06)",
-            flexWrap: "wrap",
-            animation: `${fadeInUp} 0.6s ease-out 0.2s both`,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 2 }}>
-            <FilterList sx={{ color: "primary.main" }} />
-            <Typography sx={{ fontWeight: 600, color: "primary.main" }}>
-              Filtrar:
-            </Typography>
-          </Box>
-
-          <FormControl
-            sx={{
-              minWidth: 220,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2.5,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
-                },
-                "&.Mui-focused": {
-                  boxShadow: "0px 4px 16px rgba(0,0,0,0.1)",
-                },
+              color: "white",
+              mb: 3,
+              "&:hover": {
+                bgcolor: "rgba(255,255,255,0.1)",
               },
             }}
           >
-            <InputLabel>Categoría</InputLabel>
-            <Select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              label="Categoría"
-            >
-              <MenuItem value="all">Todas las Categorías</MenuItem>
-              {categories.map((category) => (
-                <MenuItem key={category.externalId} value={category.externalId}>
-                  {category.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            Volver a Emprendimientos
+          </Button>
 
-          <Box
-            sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <Typography color="text.secondary" sx={{ fontSize: "0.9rem" }}>
-              {products.length} producto{products.length !== 1 ? "s" : ""}{" "}
-              encontrado{products.length !== 1 ? "s" : ""}
-            </Typography>
-          </Box>
-        </Box>
+          <Grid container spacing={4} alignItems="center">
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Box
+                sx={{
+                  borderRadius: 4,
+                  overflow: "hidden",
+                  boxShadow: "0px 20px 40px rgba(0,0,0,0.3)",
+                }}
+              >
+                <ImageWithLoader
+                  src={
+                    venture.imageUrl ||
+                    "https://via.placeholder.com/400x300?text=Emprendimiento"
+                  }
+                  alt={venture.name}
+                  height={250}
+                />
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Box sx={{ animation: `${fadeInUp} 0.6s ease-out` }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+                >
+                  <Box
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 2,
+                      bgcolor: "rgba(255,255,255,0.15)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Storefront sx={{ fontSize: 28 }} />
+                  </Box>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: { xs: "1.8rem", md: "2.5rem" },
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {venture.name}
+                  </Typography>
+                </Box>
+
+                <Typography
+                  sx={{
+                    fontSize: { xs: "1rem", md: "1.1rem" },
+                    opacity: 0.9,
+                    mb: 3,
+                    lineHeight: 1.7,
+                    maxWidth: 600,
+                  }}
+                >
+                  {venture.description ||
+                    "Este emprendimiento aún no tiene descripción."}
+                </Typography>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                  {venture.categories.map((category) => (
+                    <Chip
+                      key={category.externalId}
+                      label={category.name}
+                      sx={{
+                        bgcolor: "rgba(255,152,0,0.9)",
+                        color: "white",
+                        fontWeight: 600,
+                        fontSize: "0.85rem",
+                      }}
+                    />
+                  ))}
+                </Box>
+
+                <Box sx={{ mt: 3 }}>
+                  <Typography sx={{ opacity: 0.8, fontSize: "0.95rem" }}>
+                    {products.length} producto{products.length !== 1 ? "s" : ""}{" "}
+                    disponible{products.length !== 1 ? "s" : ""}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Products Section */}
+      <Container maxWidth="lg" sx={{ py: 5 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+            mb: 4,
+            color: "primary.main",
+            animation: `${fadeInUp} 0.6s ease-out`,
+          }}
+        >
+          Productos de {venture.name}
+        </Typography>
 
         {products.length === 0 ? (
           <Box
             sx={{
               textAlign: "center",
-              py: 12,
+              py: 10,
               bgcolor: "white",
               borderRadius: 4,
               border: "1px solid rgba(0,0,0,0.06)",
-              animation: `${fadeInUp} 0.6s ease-out`,
             }}
           >
             <Box
               sx={{
-                width: 100,
-                height: 100,
+                width: 80,
+                height: 80,
                 borderRadius: "50%",
                 bgcolor: "rgba(30,58,95,0.1)",
                 display: "flex",
@@ -268,16 +342,13 @@ export default function Products() {
                 mb: 3,
               }}
             >
-              <Store sx={{ fontSize: 50, color: "primary.main" }} />
+              <ShoppingCart sx={{ fontSize: 40, color: "primary.main" }} />
             </Box>
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: 700, mb: 1, color: "primary.main" }}
-            >
-              No hay productos disponibles
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+              Este emprendimiento aún no tiene productos
             </Typography>
-            <Typography color="text.secondary" sx={{ fontSize: "1.1rem" }}>
-              Intenta seleccionar otra categoría
+            <Typography color="text.secondary">
+              Vuelve pronto para ver las novedades
             </Typography>
           </Box>
         ) : (
@@ -306,9 +377,6 @@ export default function Products() {
                       "& .product-image": {
                         transform: "scale(1.08)",
                       },
-                      "& .product-overlay": {
-                        opacity: 1,
-                      },
                     },
                   }}
                 >
@@ -319,19 +387,8 @@ export default function Products() {
                         "https://via.placeholder.com/400x300?text=Producto"
                       }
                       alt={product.name}
-                      height={240}
+                      height={200}
                       className="product-image"
-                    />
-                    <Box
-                      className="product-overlay"
-                      sx={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to top, rgba(30,58,95,0.8) 0%, transparent 60%)",
-                        opacity: 0,
-                        transition: "opacity 0.4s ease",
-                      }}
                     />
                     {product.stock === 0 && (
                       <Box
@@ -351,6 +408,24 @@ export default function Products() {
                         Agotado
                       </Box>
                     )}
+                    {product.stock > 0 && product.stock <= 5 && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 16,
+                          right: 16,
+                          bgcolor: "rgba(255,152,0,0.9)",
+                          color: "white",
+                          px: 2,
+                          py: 0.5,
+                          borderRadius: 2,
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        ¡Últimas unidades!
+                      </Box>
+                    )}
                   </Box>
 
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -358,57 +433,15 @@ export default function Products() {
                       variant="h6"
                       gutterBottom
                       noWrap
-                      sx={{
-                        fontWeight: 700,
-                        color: "primary.main",
-                        letterSpacing: "-0.02em",
-                      }}
+                      sx={{ fontWeight: 700, color: "primary.main" }}
                     >
                       {product.name}
                     </Typography>
 
-                    <Box
-                      onClick={() =>
-                        navigate(`/ventures/${product.ventureExternalId}`)
-                      }
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 2,
-                        py: 1,
-                        px: 1.5,
-                        bgcolor: "rgba(30,58,95,0.05)",
-                        borderRadius: 2,
-                        width: "fit-content",
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          bgcolor: "rgba(30,58,95,0.1)",
-                        },
-                      }}
-                    >
-                      <Storefront
-                        fontSize="small"
-                        sx={{ color: "primary.main", fontSize: 16 }}
-                      />
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 500,
-                          fontSize: "0.85rem",
-                          color: "primary.main",
-                        }}
-                      >
-                        {product.ventureName}
-                      </Typography>
-                    </Box>
-
                     <Typography
-                      variant="body2"
                       color="text.secondary"
                       sx={{
-                        mb: 2.5,
+                        mb: 2,
                         lineHeight: 1.7,
                         minHeight: 48,
                         display: "-webkit-box",
@@ -417,29 +450,27 @@ export default function Products() {
                         overflow: "hidden",
                       }}
                     >
-                      {product.description || "Sin descripción disponible"}
+                      {product.description || "Sin descripción"}
                     </Typography>
 
                     <Box
                       sx={{
-                        mb: 3,
+                        mb: 2,
                         display: "flex",
                         flexWrap: "wrap",
-                        gap: 0.75,
+                        gap: 0.5,
                       }}
                     >
-                      {product.categories.slice(0, 3).map((category) => (
+                      {product.categories.slice(0, 2).map((category) => (
                         <Chip
                           key={category.externalId}
                           label={category.name}
                           size="small"
                           sx={{
-                            bgcolor: "primary.main",
-                            color: "white",
+                            bgcolor: "rgba(30,58,95,0.1)",
+                            color: "primary.main",
                             fontWeight: 600,
                             fontSize: "0.7rem",
-                            height: 26,
-                            borderRadius: 1.5,
                           }}
                         />
                       ))}

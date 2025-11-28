@@ -24,9 +24,9 @@ import {
   LocationOn,
   Lock,
   Person,
+  Rocket,
   ShoppingBag,
   Store,
-  Storefront,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -37,24 +37,24 @@ import { UserRole } from "~/lib/api/types";
 const registerSchema = z
   .object({
     role: z.enum(["ENTREPRENEUR", "CUSTOMER"]),
-    firstName: z.string().min(2, "First name must be at least 2 characters"),
-    lastName: z.string().min(2, "Last name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
+    firstName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+    lastName: z.string().min(2, "El apellido debe tener al menos 2 caracteres"),
+    email: z.string().email("Correo electrónico inválido"),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
+      .regex(/[A-Z]/, "La contraseña debe contener al menos una mayúscula")
+      .regex(/[a-z]/, "La contraseña debe contener al menos una minúscula")
+      .regex(/[0-9]/, "La contraseña debe contener al menos un número")
       .regex(
         /[^A-Za-z0-9]/,
-        "Password must contain at least one special character"
+        "La contraseña debe contener al menos un carácter especial"
       ),
     confirmPassword: z.string(),
     address: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
 
@@ -88,7 +88,7 @@ export default function Register() {
       setLoading(true);
       setError(null);
 
-      // Register the user
+      // Registrar el usuario
       await apiClient.register({
         role: data.role as UserRole,
         firstName: data.firstName,
@@ -98,7 +98,7 @@ export default function Register() {
         address: data.address,
       });
 
-      // Auto-login after registration
+      // Auto-login después del registro
       const loginResponse = await apiClient.login({
         email: data.email,
         password: data.password,
@@ -106,14 +106,14 @@ export default function Register() {
 
       loginWithResponse(loginResponse);
 
-      // Redirect based on role
+      // Redirigir según el rol
       if (loginResponse.role === UserRole.ENTREPRENEUR) {
-        navigate("/dashboard");
+        navigate("/panel");
       } else {
-        navigate("/products");
+        navigate("/productos");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(err instanceof Error ? err.message : "Error en el registro");
     } finally {
       setLoading(false);
     }
@@ -124,10 +124,10 @@ export default function Register() {
       borderRadius: 3,
       transition: "all 0.3s ease",
       "&:hover": {
-        boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+        boxShadow: "0px 4px 12px rgba(5, 150, 105, 0.1)",
       },
       "&.Mui-focused": {
-        boxShadow: "0px 4px 16px rgba(0,0,0,0.12)",
+        boxShadow: "0px 4px 16px rgba(5, 150, 105, 0.15)",
       },
     },
   };
@@ -140,7 +140,7 @@ export default function Register() {
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%)",
+        background: "linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%)",
         py: 4,
         "&::before": {
           content: '""',
@@ -150,18 +150,8 @@ export default function Register() {
           width: "60%",
           height: "120%",
           background:
-            "radial-gradient(ellipse, rgba(0,0,0,0.03) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(5,150,105,0.08) 0%, transparent 70%)",
           transform: "rotate(15deg)",
-        },
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          bottom: "-30%",
-          right: "-10%",
-          width: "50%",
-          height: "100%",
-          background:
-            "radial-gradient(ellipse, rgba(0,0,0,0.02) 0%, transparent 70%)",
         },
       }}
     >
@@ -170,8 +160,8 @@ export default function Register() {
           sx={{
             bgcolor: "white",
             borderRadius: 5,
-            boxShadow: "0px 24px 80px rgba(0, 0, 0, 0.1)",
-            border: "1px solid rgba(0,0,0,0.05)",
+            boxShadow: "0px 24px 80px rgba(5, 150, 105, 0.12)",
+            border: "1px solid rgba(5, 150, 105, 0.1)",
             overflow: "hidden",
           }}
         >
@@ -185,7 +175,8 @@ export default function Register() {
             >
               <Box
                 sx={{
-                  bgcolor: "black",
+                  background:
+                    "linear-gradient(135deg, #059669 0%, #047857 100%)",
                   color: "white",
                   p: 5,
                   display: "flex",
@@ -219,7 +210,7 @@ export default function Register() {
                     height: 200,
                     borderRadius: "50%",
                     background:
-                      "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+                      "radial-gradient(circle, rgba(245,158,11,0.3) 0%, transparent 70%)",
                   }}
                 />
 
@@ -229,14 +220,15 @@ export default function Register() {
                       width: 60,
                       height: 60,
                       borderRadius: 3,
-                      bgcolor: "rgba(255,255,255,0.1)",
+                      bgcolor: "secondary.main",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       mb: 4,
+                      boxShadow: "0px 8px 24px rgba(245,158,11,0.3)",
                     }}
                   >
-                    <Storefront sx={{ fontSize: 32 }} />
+                    <Rocket sx={{ fontSize: 32, color: "black" }} />
                   </Box>
 
                   <Typography
@@ -247,27 +239,27 @@ export default function Register() {
                       letterSpacing: "-0.02em",
                     }}
                   >
-                    Join Bacan Today
+                    Únete a Bacán
                   </Typography>
                   <Typography
                     sx={{
-                      opacity: 0.7,
+                      opacity: 0.85,
                       fontSize: "1.05rem",
                       lineHeight: 1.7,
                       mb: 4,
                     }}
                   >
-                    Create your account and start your journey in the modern
-                    marketplace.
+                    Crea tu cuenta y comienza tu viaje en la plataforma de
+                    emprendedores más grande.
                   </Typography>
 
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                   >
                     {[
-                      "Zero commission fees",
-                      "Instant account setup",
-                      "24/7 customer support",
+                      "Sin comisiones ocultas",
+                      "Configuración en minutos",
+                      "Soporte 24/7",
                     ].map((text, index) => (
                       <Box
                         key={index}
@@ -278,11 +270,13 @@ export default function Register() {
                             width: 20,
                             height: 20,
                             borderRadius: "50%",
-                            bgcolor: "rgba(255,255,255,0.2)",
+                            bgcolor: "secondary.main",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontSize: "0.7rem",
+                            color: "black",
+                            fontWeight: 700,
                           }}
                         >
                           ✓
@@ -309,10 +303,10 @@ export default function Register() {
                       letterSpacing: "-0.02em",
                     }}
                   >
-                    Create Account
+                    Crear Cuenta
                   </Typography>
                   <Typography color="text.secondary" sx={{ fontSize: "1rem" }}>
-                    Fill in your details to get started
+                    Completa tus datos para comenzar
                   </Typography>
                 </Box>
 
@@ -345,7 +339,7 @@ export default function Register() {
                         fontSize: "0.9rem",
                       }}
                     >
-                      I want to:
+                      Quiero:
                     </Typography>
                     <RadioGroup
                       row
@@ -365,19 +359,21 @@ export default function Register() {
                           p: 2,
                           border: "2px solid",
                           borderColor:
-                            selectedRole === "CUSTOMER" ? "black" : "divider",
+                            selectedRole === "CUSTOMER"
+                              ? "primary.main"
+                              : "divider",
                           borderRadius: 3,
                           cursor: "pointer",
                           transition: "all 0.3s ease",
                           bgcolor:
                             selectedRole === "CUSTOMER"
-                              ? "rgba(0,0,0,0.02)"
+                              ? "rgba(5, 150, 105, 0.05)"
                               : "transparent",
                           "&:hover": {
                             borderColor:
                               selectedRole === "CUSTOMER"
-                                ? "black"
-                                : "rgba(0,0,0,0.3)",
+                                ? "primary.main"
+                                : "primary.light",
                           },
                         }}
                       >
@@ -393,7 +389,7 @@ export default function Register() {
                               fontSize: 28,
                               color:
                                 selectedRole === "CUSTOMER"
-                                  ? "black"
+                                  ? "primary.main"
                                   : "text.secondary",
                             }}
                           />
@@ -401,7 +397,7 @@ export default function Register() {
                             <Typography
                               sx={{ fontWeight: 600, fontSize: "0.95rem" }}
                             >
-                              Buy Products
+                              Comprar Productos
                             </Typography>
                             <Typography
                               sx={{
@@ -409,7 +405,7 @@ export default function Register() {
                                 color: "text.secondary",
                               }}
                             >
-                              Shop from entrepreneurs
+                              Apoyar emprendedores
                             </Typography>
                           </Box>
                         </Box>
@@ -434,20 +430,20 @@ export default function Register() {
                           border: "2px solid",
                           borderColor:
                             selectedRole === "ENTREPRENEUR"
-                              ? "black"
+                              ? "primary.main"
                               : "divider",
                           borderRadius: 3,
                           cursor: "pointer",
                           transition: "all 0.3s ease",
                           bgcolor:
                             selectedRole === "ENTREPRENEUR"
-                              ? "rgba(0,0,0,0.02)"
+                              ? "rgba(5, 150, 105, 0.05)"
                               : "transparent",
                           "&:hover": {
                             borderColor:
                               selectedRole === "ENTREPRENEUR"
-                                ? "black"
-                                : "rgba(0,0,0,0.3)",
+                                ? "primary.main"
+                                : "primary.light",
                           },
                         }}
                       >
@@ -463,7 +459,7 @@ export default function Register() {
                               fontSize: 28,
                               color:
                                 selectedRole === "ENTREPRENEUR"
-                                  ? "black"
+                                  ? "primary.main"
                                   : "text.secondary",
                             }}
                           />
@@ -471,7 +467,7 @@ export default function Register() {
                             <Typography
                               sx={{ fontWeight: 600, fontSize: "0.95rem" }}
                             >
-                              Sell Products
+                              Vender Productos
                             </Typography>
                             <Typography
                               sx={{
@@ -479,7 +475,7 @@ export default function Register() {
                                 color: "text.secondary",
                               }}
                             >
-                              Start your venture
+                              Crear mi emprendimiento
                             </Typography>
                           </Box>
                         </Box>
@@ -502,7 +498,7 @@ export default function Register() {
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <TextField
                         {...register("firstName")}
-                        label="First Name"
+                        label="Nombre"
                         fullWidth
                         error={!!errors.firstName}
                         helperText={errors.firstName?.message}
@@ -510,7 +506,7 @@ export default function Register() {
                           startAdornment: (
                             <InputAdornment position="start">
                               <Person
-                                sx={{ color: "text.secondary", fontSize: 20 }}
+                                sx={{ color: "primary.main", fontSize: 20 }}
                               />
                             </InputAdornment>
                           ),
@@ -521,7 +517,7 @@ export default function Register() {
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <TextField
                         {...register("lastName")}
-                        label="Last Name"
+                        label="Apellido"
                         fullWidth
                         error={!!errors.lastName}
                         helperText={errors.lastName?.message}
@@ -529,7 +525,7 @@ export default function Register() {
                           startAdornment: (
                             <InputAdornment position="start">
                               <Person
-                                sx={{ color: "text.secondary", fontSize: 20 }}
+                                sx={{ color: "primary.main", fontSize: 20 }}
                               />
                             </InputAdornment>
                           ),
@@ -541,7 +537,7 @@ export default function Register() {
 
                   <TextField
                     {...register("email")}
-                    label="Email Address"
+                    label="Correo Electrónico"
                     type="email"
                     fullWidth
                     margin="normal"
@@ -550,9 +546,7 @@ export default function Register() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Email
-                            sx={{ color: "text.secondary", fontSize: 20 }}
-                          />
+                          <Email sx={{ color: "primary.main", fontSize: 20 }} />
                         </InputAdornment>
                       ),
                     }}
@@ -561,21 +555,19 @@ export default function Register() {
 
                   <TextField
                     {...register("password")}
-                    label="Password"
+                    label="Contraseña"
                     type={showPassword ? "text" : "password"}
                     fullWidth
                     margin="normal"
                     error={!!errors.password}
                     helperText={
                       errors.password?.message ||
-                      "Min 8 chars, uppercase, lowercase, number, special char"
+                      "Mín. 8 caracteres, mayúscula, minúscula, número, especial"
                     }
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Lock
-                            sx={{ color: "text.secondary", fontSize: 20 }}
-                          />
+                          <Lock sx={{ color: "primary.main", fontSize: 20 }} />
                         </InputAdornment>
                       ),
                       endAdornment: (
@@ -594,7 +586,7 @@ export default function Register() {
 
                   <TextField
                     {...register("confirmPassword")}
-                    label="Confirm Password"
+                    label="Confirmar Contraseña"
                     type={showConfirmPassword ? "text" : "password"}
                     fullWidth
                     margin="normal"
@@ -603,9 +595,7 @@ export default function Register() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Lock
-                            sx={{ color: "text.secondary", fontSize: 20 }}
-                          />
+                          <Lock sx={{ color: "primary.main", fontSize: 20 }} />
                         </InputAdornment>
                       ),
                       endAdornment: (
@@ -630,7 +620,7 @@ export default function Register() {
 
                   <TextField
                     {...register("address")}
-                    label="Address (Optional)"
+                    label="Dirección (Opcional)"
                     fullWidth
                     margin="normal"
                     multiline
@@ -642,7 +632,7 @@ export default function Register() {
                           sx={{ alignSelf: "flex-start", mt: 1.5 }}
                         >
                           <LocationOn
-                            sx={{ color: "text.secondary", fontSize: 20 }}
+                            sx={{ color: "primary.main", fontSize: 20 }}
                           />
                         </InputAdornment>
                       ),
@@ -662,21 +652,21 @@ export default function Register() {
                       py: 1.8,
                       fontSize: "1.05rem",
                       fontWeight: 700,
-                      bgcolor: "black",
+                      bgcolor: "primary.main",
                       borderRadius: 3,
-                      boxShadow: "0px 8px 24px rgba(0,0,0,0.25)",
+                      boxShadow: "0px 8px 24px rgba(5, 150, 105, 0.3)",
                       transition: "all 0.3s ease",
                       "&:hover": {
-                        bgcolor: "#1a1a1a",
+                        bgcolor: "primary.dark",
                         transform: "translateY(-2px)",
-                        boxShadow: "0px 12px 32px rgba(0,0,0,0.3)",
+                        boxShadow: "0px 12px 32px rgba(5, 150, 105, 0.4)",
                       },
                       "&:active": {
                         transform: "translateY(0)",
                       },
                     }}
                   >
-                    {loading ? "Creating Account..." : "Create Account"}
+                    {loading ? "Creando cuenta..." : "Crear Mi Cuenta"}
                   </Button>
 
                   <Box sx={{ mt: 3, textAlign: "center" }}>
@@ -684,12 +674,12 @@ export default function Register() {
                       color="text.secondary"
                       sx={{ fontSize: "0.95rem" }}
                     >
-                      Already have an account?{" "}
+                      ¿Ya tienes una cuenta?{" "}
                       <Box
                         component={Link}
-                        to="/login"
+                        to="/ingresar"
                         sx={{
-                          color: "black",
+                          color: "primary.main",
                           fontWeight: 600,
                           textDecoration: "none",
                           transition: "opacity 0.2s ease",
@@ -698,7 +688,7 @@ export default function Register() {
                           },
                         }}
                       >
-                        Sign In
+                        Iniciar Sesión
                       </Box>
                     </Typography>
                   </Box>
